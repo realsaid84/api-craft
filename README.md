@@ -1,6 +1,10 @@
+# API Design Craft Studio Framework
+
+
+# About the Project 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## Running this Project
 
 First, run the development server:
 
