@@ -101,7 +101,7 @@ export  const OpenAPIWorkshop = () => {
       <div className="mb-12">
         <div className="mb-8 flex items-center justify-between">
         <h1 className="text-4xl font-bold mb-4">OpenAPI 3.0 Workshop</h1>
-          <Link href="learn/openapi-documentation" className="no-underline">
+          <Link href="../learn/openapi-cheatsheet" className="no-underline">
             <Button className="flex items-center gap-2">
               <BookOpen className="w-5 h-5" />
               Return to the Cheatsheet

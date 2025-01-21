@@ -74,7 +74,7 @@ export const OpenAPIDocumentation = () => {
    {/* Add navigation section at the top */}
     <div className="mb-8 flex items-center justify-between">
       <h1 className="text-4xl font-bold">OpenAPI 3.0 Cheatsheet</h1>
-      <Link href="learn/openapi-workshop" className="no-underline">
+      <Link href="../learn/openapi-workshop" className="no-underline">
         <Button className="flex items-center gap-2">
           <GraduationCap className="w-5 h-5" />
           Take the Workshop
@@ -380,7 +380,7 @@ properties:
         <p className="text-gray-600 mb-4">
           Take our interactive workshop to get hands-on experience with OpenAPI documentation.
         </p>
-        <Link href="../openapi-workshop" className="no-underline">
+        <Link href="../learn/openapi-workshop" className="no-underline">
           <Button variant="default" className="flex items-center gap-2">
             <GraduationCap className="w-5 h-5" />
             Start the Workshop

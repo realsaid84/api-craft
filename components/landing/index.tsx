@@ -20,8 +20,8 @@ const Sidebar = () => {
     {
       title: 'LEARN',
       items: [
-        { name: 'OpenAPI 3.0 Cheatsheet', path: '/learn/openapi-cheatsheet' },
-        { name: 'OpenAPI Workshop', path: '/learn/openapi-workshop' }
+        { name: 'OpenAPI 3.0 Cheatsheet', path: '/pages/learn/openapi-cheatsheet' },
+        { name: 'OpenAPI Workshop', path: '/pages/learn/openapi-workshop' }
       ]
     },
     {
@@ -137,7 +137,7 @@ const MainContent = () => {
       icon: BookOpen,
       title: "Learn OpenAPI →",
       description: "Master OpenAPI 3.0 with our comprehensive cheatsheet and interactive workshop for API design best practices.",
-      link: "/learn/openapi-cheatsheet"
+      link: "/pages/learn/openapi-cheatsheet"
     },
     {
       icon: FileSearch,
