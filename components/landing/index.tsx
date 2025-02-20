@@ -1,10 +1,10 @@
 import React from 'react';
-import { Eye, Settings, ShieldCheck, Code, Activity, Heart, FileSearch, BookOpen } from 'lucide-react';
+import { Settings, ShieldCheck, Code, Activity, Heart, FileSearch, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 // Main Layout Component
-const Layout = () => {
+const LandingLayout = () => {
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
@@ -13,9 +13,10 @@ const Layout = () => {
   );
 };
 
-export default Layout;
+export default LandingLayout;
 
-const Sidebar = () => {
+
+export const Sidebar = () => {
   const menuSections = [
     {
       title: 'LEARN',
@@ -27,10 +28,10 @@ const Sidebar = () => {
     {
       title: 'DISCOVER',
       items: [
-        { name: 'Reusable Data Models', path: '/discover/data-models' },
-        { name: 'API Common Components', path: '/discover/components' },
-        { name: 'Interactive Data Dictionaries', path: '/discover/dictionaries' },
-        { name: 'API Contracts', path: '/discover/contracts' }
+        { name: 'Reusable Data Models', path: '/pages/discover/data-models' },
+        { name: 'API Common Components', path: '/pages/discover/components' },
+        { name: 'Interactive Data Dictionaries', path: '/pages/discover/dictionaries' },
+        { name: 'API Contracts', path: '/pages/discover/api-contracts' }
       ]
     },
     {
@@ -77,7 +78,11 @@ const Sidebar = () => {
             <div className="absolute inset-0 bg-teal-500 opacity-75 transform rotate-90"></div>
           </div>
         </div>
-        <h1 className="text-center text-xl font-bold text-gray-600">API Design Studio</h1>
+        <a href="/" className="inline-block hover:opacity-80 transition-opacity">
+            <h1 className="text-center text-xl font-bold text-gray-700">
+              API Craft Accelerator
+            </h1>
+        </a>
         <p className="text-center text-sm text-gray-400">Quick Tour</p>
         <div className="flex items-center justify-center"> <ThemeToggle /></div>
       </div>
@@ -135,30 +140,30 @@ const MainContent = () => {
   const features = [
     {
       icon: BookOpen,
-      title: "Learn OpenAPI →",
-      description: "Master OpenAPI 3.0 with our comprehensive cheatsheet and interactive workshop for API design best practices.",
+      title: "Learn API Standards →",
+      description: "Master OpenAPI 3.0 with our comprehensive cheatsheet and interactive workshop for API design best practices. Thereafter, discover API standards and patterns.",
       link: "/pages/learn/openapi-cheatsheet"
     },
     {
       icon: FileSearch,
-      title: "Data Model Discovery →",
+      title: "Discover Reusable Data Models →",
       description: "Search your entire data ecosystem, including dashboards, datasets, ML models, and raw files.",
       link: "/discover/data-models"
     },
     {
-      icon: Code,
-      title: "API Components and Contracts Discovery →",
+      icon: Settings,
+      title: "Discover API Common Components and Contracts →",
       description: "Discover API common components, Templates and existing contracts.",
       link: "/discover/components"
     },
     {
       icon: ShieldCheck,
-      title: "Data Quality Control →",
-      description: "Improve data quality through metadata tests, assertions, data freshness checks, and data contracts.",
+      title: "Data and API Quality Control →",
+      description: "Improve data and API quality through metadata tests, assertions, governance validations, and conformance checks.",
       link: "/observe/data-quality"
     },
     {
-      icon: Settings,
+      icon: Code,
       title: "Design APIs and Data Models →",
       description: "Easily author APIs leveraging data models and standard templates to kicks-sart your API design using an intuitive.",
       link: "/design/api"
@@ -183,7 +188,7 @@ const MainContent = () => {
   <div className="mb-12">
     <h1 className="text-4xl font-bold mb-4">Get Started</h1>
     <p className="text-xl text-muted-foreground mb-6">
-      Author, discover, and manage your API delivery ecosystem with ease. 
+    Author, discover, and manage your API delivery ecosystem with ease.
     </p>
     <p className="text-sm text-muted-foreground mb-4">
       To get started, simply explore and discover the vast Domain assets of reusable data models and API common components.
