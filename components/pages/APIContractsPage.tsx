@@ -51,8 +51,10 @@ const DataModelCard = ({ model }: { model: APIContractModel }) => {
             <span className={`px-2 py-1 rounded-full text-xs ${
               model.status === 'Active' ? 'bg-green-100 text-green-800' :
               model.status === 'Beta' ? 'bg-yellow-100 text-yellow-800' :
+              model.status === 'GA' ? 'bg-teal-100 text-teal-800' :
               model.status === 'Alpha' ? 'bg-orange-100 text-orange-800' :
-              model.status === 'Deprecated' ? 'bg-grey-100 text-grey-800' :
+              model.status === 'Deprecated' ? 'bg-red-100 text-red-800' :
+              model.status === 'Retired' ? 'bg-gray-100 text-gray-800' :
               'bg-red-100 text-red-800'
             }`}>
               {model.status}
@@ -134,6 +136,102 @@ export const APIContractsPage = () => {
       lastModified: '2024-01-20',
       owner: 'Treasury Services',
       tags: ['payment', 'core'],
+      schema: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          amount: { type: 'number' },
+          currency: { type: 'string' }
+        }
+      }
+    },
+
+    {
+      id: '3',
+      name: 'Account Balances API',
+      description: 'Enables seamless access to account information and balances',
+      version: '2.0.1',
+      domain: 'Account',
+      status: 'Active',
+      lastModified: '2025-01-20',
+      owner: 'Treasury Services',
+      tags: ['payment', 'account', 'balances', 'liquidity'],
+      schema: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          amount: { type: 'number' },
+          currency: { type: 'string' }
+        }
+      }
+    },
+    {
+      id: '4',
+      name: 'Transaction Details API',
+      description: 'Enables seamless access to transaction details and history',
+      version: '3.0.0',
+      domain: 'Payment',
+      status: 'GA',
+      lastModified: '2024-01-20',
+      owner: 'Treasury Services',
+      tags: ['payment', 'reports', 'accounts', 'transactions'],
+      schema: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          amount: { type: 'number' },
+          currency: { type: 'string' }
+        }
+      }
+    },
+    {
+      id: '5',
+      name: 'Pay By Bank API',
+      description: 'Facilitates Open Banking payments and account information services.',
+      version: '2.0.0',
+      domain: 'Receivables',
+      status: 'GA',
+      lastModified: '2024-12-02',
+      owner: 'Treasury Services',
+      tags: ['payment', 'reports', 'accounts', 'transactions'],
+      schema: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          amount: { type: 'number' },
+          currency: { type: 'string' }
+        }
+      }
+    },
+    {
+      id: '6',
+      name: 'Australia Realtime Payments API',
+      description: 'Enables initiation of real-time payments in Australia',
+      version: '1.0.0',
+      domain: 'Payment',
+      status: 'Deprecated',
+      lastModified: '2020-12-02',
+      owner: 'Treasury Services',
+      tags: ['payment', 'core'],
+      schema: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          amount: { type: 'number' },
+          currency: { type: 'string' }
+        }
+      }
+    },
+    {
+      id: '7',
+      name: 'Elrond API',
+      description: 'Faciltates payment initiation via an Elrond trust token',
+      version: '1.0.0',
+      domain: 'Risk',
+      status: 'Retired',
+      lastModified: '2020-12-02',
+      owner: 'Treasury Services',
+      tags: ['risk', 'core'],
       schema: {
         type: 'object',
         properties: {
@@ -236,6 +334,7 @@ export const APIContractsPage = () => {
                 <SelectItem value="GA">GA</SelectItem>
                 <SelectItem value="Active">Active</SelectItem>
                 <SelectItem value="Deprecated">Deprecated</SelectItem>
+                <SelectItem value="Retired">Retired</SelectItem>
               </SelectContent>
             </Select>
           </div>
