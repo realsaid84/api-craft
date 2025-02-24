@@ -335,9 +335,9 @@ export const DataModelsPage = () => {
   }
 
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-8 lg:p-10">
+    <div className="flex-1 overflow-auto p-2 md:p-8 lg:p-10">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold">Data Models</h1>
+        <h1 className="text-4xl font-bold text-teal-600">Data Models</h1>
         <p className="text-xl text-muted-foreground">
           Discover and manage reusable data models across your organization.
         </p>

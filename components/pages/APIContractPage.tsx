@@ -51,14 +51,14 @@ const securitySchemes = [
 export const APIContractPage = () => {
   const [enableWebhooks, setEnableWebhooks] = useState(false);
   const [projectName, setProjectName] = useState('');
-  const [projectLocation, setProjectLocation] = useState('/Users/blueseal/workspace/devbox/api');
+  const [projectLocation, setProjectLocation] = useState('/Users/blueseal/workspace/devbox/api/');
   const [selectedModels, setSelectedModels] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [namespace, setNamespace] = useState('');
   const [majorVersion, setMajorVersion] = useState('v1');
 
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-8 lg:p-10">
+    <div className="flex-1 overflow-auto p-2 md:p-8 lg:p-10">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-bold text-teal-600">Design an API</h1>
         <p className="text-xl text-muted-foreground">
@@ -88,7 +88,7 @@ export const APIContractPage = () => {
                         htmlFor="webhooks"
                         className="text-sm font-medium leading-none text-teal-600 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        Enable webhooks for this API
+                        Enable webhooks for this API resources
                       </label>
                     </div>
 
@@ -96,9 +96,12 @@ export const APIContractPage = () => {
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-teal-600">Project Name</label>
                       <Input 
-                        placeholder="The name of the Project"
-                        value={projectName}
-                        onChange={(e) => setProjectName(e.target.value)}
+                      placeholder="The name of the Project"
+                      value={projectName}
+                      onChange={(e) => {
+                        setProjectName(e.target.value);
+                      }}
+                      onBlur={(e) => {setProjectLocation(`${projectLocation}${e.target.value}`);}}
                       />
                     </div>
 
@@ -119,10 +122,14 @@ export const APIContractPage = () => {
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-teal-600">Namespace (basePath)</label>
                       <Input 
-                        placeholder="/api/v1/treasury"
+                        placeholder="payment"
                         value={namespace}
                         onChange={(e) => setNamespace(e.target.value)}
                       />
+                       <div className="flex items-center text-sm text-teal-600">
+                        <ExternalLink className="h-4 w-4 mr-1" />
+                        <a href="https://go/payments-api-env" className="hover:underline">Discover approved namespaces</a>
+                      </div>
                     </div>
 
                     {/* Major Version */}
@@ -157,7 +164,7 @@ export const APIContractPage = () => {
                       </Select>
                       <div className="flex items-center text-sm text-teal-600">
                         <ExternalLink className="h-4 w-4 mr-1" />
-                        <a href="/discover/data-models" className="hover:underline">Browse Data Models</a>
+                        <a href="/pages/discover/data-models" className="hover:underline">Browse Data Models</a>
                       </div>
                     </div>
 
@@ -214,15 +221,15 @@ export const APIContractPage = () => {
                     {/* API Specification Language */}
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-teal-600">API Specification Language</label>
-                      <Select defaultValue="oas3">
+                      <Select defaultValue="oas3.0">
                         <SelectTrigger>
                           <SelectValue placeholder="Select specification language" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="oas3">OAS 3.0 (YAML)</SelectItem>
-                          <SelectItem value="oas2">OAS 2.0 (YAML)</SelectItem>
+                          <SelectItem value="oas3.0">OAS 3.0 (YAML)</SelectItem>
+                          <SelectItem value="oas3.1">OAS 3.1 (YAML)</SelectItem>
                           <SelectItem value="asyncapi">ASYNC API (YAML)</SelectItem>
-                          <SelectItem value="proto">Protocol Buffers</SelectItem>
+                          <SelectItem value="protobuf">Protocol Buffers</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -240,6 +247,11 @@ export const APIContractPage = () => {
                           ))}
                         </SelectContent>
                       </Select>
+                       <div className="flex items-center text-sm text-teal-600">
+                        <ExternalLink className="h-4 w-4 mr-1" />
+                        <a href="https://go/payments-domain-model" className="hover:underline">Discover domains</a>
+                      </div>
+                      
                     </div>
 
                     {/* Action Buttons */}

@@ -1,4 +1,4 @@
-// app/pages/discover/data-models/page.tsx
+// app/pages/design/api/page.tsx
 'use client';
 
 import { APIContractPage } from '@/components/pages/APIContractPage';

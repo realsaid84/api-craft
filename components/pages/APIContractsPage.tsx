@@ -293,9 +293,9 @@ export const APIContractsPage = () => {
   }
 
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-8 lg:p-10">
+    <div className="flex-1 overflow-auto p-6 md:p-2 lg:p-10">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold">API Contracts</h1>
+        <h1 className="text-4xl font-bold text-teal-600">API Contracts</h1>
         <p className="text-xl text-muted-foreground">
           Discover and manage API contracts across different domains.
         </p>

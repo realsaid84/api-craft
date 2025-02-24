@@ -1,4 +1,4 @@
-// components/types/data-models.ts
+// components/types/api-contracts.ts
 export interface APIContractModel {
     id: string;
     name: string;

@@ -70,17 +70,19 @@ const Task = ({ children }: BlockProps) => (
 
 export const OpenAPIDocumentation = () => {
   return (
-    <div className="max-w-5xl mx-auto p-8 bg-white">     
-   {/* Add navigation section at the top */}
-    <div className="mb-8 flex items-center justify-between">
-      <h1 className="text-4xl font-bold">OpenAPI 3.0 Cheatsheet</h1>
-      <Link href="../learn/openapi-workshop" className="no-underline">
+    <div className="flex-1 overflow-auto p-2 md:p-8 lg:p-10">
+      <div className="mb-12">
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-4xl font-bold mb-4  text-teal-600">OpenAPI 3.0 Cheatsheet</h1>
+        </div> 
+        <Link href="../learn/openapi-workshop" className="no-underline">
         <Button className="flex items-center gap-2">
           <GraduationCap className="w-5 h-5" />
           Take the Workshop
         </Button>
-      </Link>
-    </div>
+        </Link>
+        </div>
+     
       
       <Section icon={FileText} title="Document Structure">
         <p className="mb-4">An OpenAPI document is a JSON or YAML file containing these root elements:</p>
