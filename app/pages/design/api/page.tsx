@@ -1,8 +1,8 @@
+// app/pages/discover/data-models/page.tsx
+'use client';
 
-// app/pages/design/api/page.tsx
-import { DesignAPIPage } from '@/components/pages/DesignAPIPage';
+import { APIContractPage } from '@/components/pages/APIContractPage';
 
 export default function Page() {
-  return <DesignAPIPage />;
+  return <APIContractPage />;
 }
-

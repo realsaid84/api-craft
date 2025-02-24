@@ -1,6 +1,6 @@
 // components/utils/pageFactory.tsx
 import React from 'react';
-import PageLayout from '../layouts/APIStudioLayout';
+import PageLayout from '../layouts/LearnLayout';
 import { BasePageProps } from '../types';
 
 interface PageFactoryProps extends BasePageProps {
@@ -16,7 +16,7 @@ interface PageProps {
 
 export const createPage = (title: string, description: string, content: React.ReactNode) => {
   return () => (
-    <PageLayout title={title} description={description}>
+    <PageLayout>
       {content}
     </PageLayout>
   );

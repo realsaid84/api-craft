@@ -38,7 +38,7 @@ const ErrorAlert = ({ message }: { message: string }) => (
   </Alert>
 );
 
-const DataModelCard = ({ model }: { model: APIContractModel }) => {
+const APIModelCard = ({ model }: { model: APIContractModel }) => {
   try {
     return (
       <Card className="block p-6 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
@@ -77,8 +77,11 @@ const DataModelCard = ({ model }: { model: APIContractModel }) => {
             <div className="flex justify-between items-center text-sm text-muted-foreground">
               <span>Updated {model.lastModified}</span>
               <span>{model.owner}</span>
+            <Button variant="outline" asChild>
+                    <a href={model.link}>{'>>'}</a>
+            </Button>
             </div>
-          </div>
+          </div> 
         </CardContent>
       </Card>
     );
@@ -117,6 +120,7 @@ export const APIContractsPage = () => {
       lastModified: '2024-01-20',
       owner: 'Treasury Services',
       tags: ['payment', 'core'],
+      link: '/openapi/demo-payments.oas.yaml',
       schema: {
         type: 'object',
         properties: {
@@ -136,6 +140,7 @@ export const APIContractsPage = () => {
       lastModified: '2024-01-20',
       owner: 'Treasury Services',
       tags: ['payment', 'core'],
+      link: '/openapi/demo-payments.oas.yaml',
       schema: {
         type: 'object',
         properties: {
@@ -156,6 +161,7 @@ export const APIContractsPage = () => {
       lastModified: '2025-01-20',
       owner: 'Treasury Services',
       tags: ['payment', 'account', 'balances', 'liquidity'],
+      link: '/openapi/demo-payments.oas.yaml',
       schema: {
         type: 'object',
         properties: {
@@ -175,6 +181,7 @@ export const APIContractsPage = () => {
       lastModified: '2024-01-20',
       owner: 'Treasury Services',
       tags: ['payment', 'reports', 'accounts', 'transactions'],
+      link: '/openapi/demo-payments.oas.yaml',
       schema: {
         type: 'object',
         properties: {
@@ -194,6 +201,7 @@ export const APIContractsPage = () => {
       lastModified: '2024-12-02',
       owner: 'Treasury Services',
       tags: ['payment', 'reports', 'accounts', 'transactions'],
+      link: '/openapi/demo-payments.oas.yaml',
       schema: {
         type: 'object',
         properties: {
@@ -213,6 +221,7 @@ export const APIContractsPage = () => {
       lastModified: '2020-12-02',
       owner: 'Treasury Services',
       tags: ['payment', 'core'],
+      link: '/openapi/demo-payments.oas.yaml',
       schema: {
         type: 'object',
         properties: {
@@ -232,6 +241,7 @@ export const APIContractsPage = () => {
       lastModified: '2020-12-02',
       owner: 'Treasury Services',
       tags: ['risk', 'core'],
+      link: '/openapi/demo-payments.oas.yaml',
       schema: {
         type: 'object',
         properties: {
@@ -376,7 +386,7 @@ export const APIContractsPage = () => {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ml-4">
             {filteredModels.map((model) => (
-              <DataModelCard key={model.id} model={model} />
+              <APIModelCard key={model.id} model={model} />
             ))}
           </div>
         ) : (

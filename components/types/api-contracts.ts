@@ -9,6 +9,7 @@ export interface APIContractModel {
     lastModified: string;
     owner: string;
     tags: string[];
+    link: string;
     schema: {
       type: string;
       format?: string;

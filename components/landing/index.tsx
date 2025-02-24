@@ -45,7 +45,7 @@ export const Sidebar = () => {
     {
       title: 'DESIGN',
       items: [
-        { name: 'Design an API', path: '/design/api' },
+        { name: 'Design an API', path: '/pages/design/api' },
         { name: 'Define a Data Model', path: '/design/data-model' },
         { name: 'Document BDD Features', path: '/design/bdd' }
       ]
@@ -166,7 +166,7 @@ const MainContent = () => {
       icon: Code,
       title: "Design APIs and Data Models →",
       description: "Easily author APIs leveraging data models and standard templates to kicks-sart your API design using an intuitive.",
-      link: "/design/api"
+      link: "/pages/design/api"
     },
     {
       icon: Activity,
