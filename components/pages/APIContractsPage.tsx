@@ -293,11 +293,12 @@ export const APIContractsPage = () => {
   }
 
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-2 lg:p-10">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold text-teal-600">API Contracts</h1>
-        <p className="text-xl text-muted-foreground">
-          Discover and manage API contracts across different domains.
+    <div className="flex-1 overflow-auto">
+      <div className="max-w-6xl mx-auto p-8">
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold text-teal-600">API Contracts</h1>
+          <p className="text-xl text-muted-foreground mb-6">
+            Discover and manage API contracts across different domains.
         </p>
       </div>
 
@@ -435,6 +436,7 @@ export const APIContractsPage = () => {
             </table>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

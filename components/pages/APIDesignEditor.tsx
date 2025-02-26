@@ -1,5 +1,5 @@
+"use client";
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Card,
@@ -23,28 +23,23 @@ import {
   ArrowLeft,
   BookOpen,
   BookOpen as BookOpenIcon,
+  ShieldCheck,
+  BadgePercent,
+  Activity,
+  Binoculars
 } from 'lucide-react';
 import * as yaml from 'js-yaml';
+import ReactMarkdown from 'react-markdown';
 
-// Interface for API Contract data
-interface APIContractData {
-  projectName: string;
-  namespace: string;
-  majorVersion: string;
-  apiType: string;
-  securityScheme: string;
-  specLanguage: string;
-  domain: string;
-  enableWebhooks: boolean;
-}
+const MarkdownRenderer: React.FC<{ children: string }> = ({ children }) => (
+  <ReactMarkdown>{children}</ReactMarkdown>
+);
 
-export const APISpecVisualizer = () => {
-  const router = useRouter();
+export const APIDesignEditor = () => {
   const [activeView, setActiveView] = useState<'code' | 'visual'>('visual');
   const [specContent, setSpecContent] = useState<string>('');
   const [parsedSpec, setParsedSpec] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [contractData, setContractData] = useState<APIContractData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [fileName, setFileName] = useState<string>('api-specification.yaml');
 
@@ -52,22 +47,28 @@ export const APISpecVisualizer = () => {
   const loadDemoSpec = async () => {
     try {
       setIsLoading(true);
-      // Using the Next.js public directory to fetch the YAML file
-      const response = await fetch('/data/open-api-demo.yaml');
-      if (!response.ok) {
-        throw new Error(`Failed to load demo spec: ${response.status} ${response.statusText}`);
+      // First, try to load the YAML file from public directory
+      try {
+        const response = await fetch('/data/open-api-demo.yaml');
+        
+        if (response.ok) {
+          const content = await response.text();
+          setSpecContent(content);
+          
+          // Parse the loaded content
+          const parsed = yaml.load(content);
+          setParsedSpec(parsed);
+          setError(null);
+          setIsLoading(false);
+          return; // Exit early if successful
+        } else {
+          console.warn(`Failed to load specification: ${response.status} ${response.statusText}`);
+        }
+      } catch (fetchErr) {
+        console.error('Error fetching OpenAPI spec file:', fetchErr);
       }
-      const content = await response.text();
-      setSpecContent(content);
       
-      // Parse the loaded content
-      const parsed = yaml.load(content);
-      setParsedSpec(parsed);
-      setError(null);
-    } catch (err) {
-      console.error('Error loading demo spec:', err);
-      
-      // Fallback to a minimal OpenAPI spec if file can't be loaded
+      // Fallback spec if file can't be loaded
       const fallbackSpec = `openapi: 3.0.3
 info:
   title: API Specification
@@ -75,92 +76,6 @@ info:
   description: A sample API specification
 paths:
   /resources:
-    get:
-      summary: Get resources
-      responses:
-        '200':
-          description: Successful response`;
-          
-      setSpecContent(fallbackSpec);
-      try {
-        const parsed = yaml.load(fallbackSpec);
-        setParsedSpec(parsed);
-      } catch (parseErr) {
-        setError('Error parsing fallback specification');
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // Load the demo spec initially
-    loadDemoSpec();
-    
-    // Check if we have contract data from navigation
-    const query = router.query;
-    if (query.projectName) {
-      const newContractData: APIContractData = {
-        projectName: query.projectName as string,
-        namespace: query.namespace as string,
-        majorVersion: query.majorVersion as string,
-        apiType: query.apiType as string,
-        securityScheme: query.securityScheme as string,
-        specLanguage: query.specLanguage as string,
-        domain: query.domain as string,
-        enableWebhooks: query.enableWebhooks === 'true',
-      };
-      setContractData(newContractData);
-
-      // Generate a new spec based on the contract data
-      generateSpecFromContract(newContractData);
-    }
-  }, [router.query]);
-
-  const generateSpecFromContract = async (data: APIContractData) => {
-    setIsLoading(true);
-    try {
-      // First try to load the template based on API type
-      let templateContent = '';
-      try {
-        // Attempt to load a template file based on API type
-        const templatePath = `/data/templates/${data.apiType}-template.yaml`;
-        const response = await fetch(templatePath);
-        if (response.ok) {
-          templateContent = await response.text();
-        }
-      } catch (err) {
-        console.warn('Template not found, using default spec generation');
-      }
-      
-      // If no template found, generate a basic spec
-      if (!templateContent) {
-        templateContent = `openapi: 3.0.3
-info:
-  title: ${data.projectName || 'API Specification'}
-  version: ${data.majorVersion || 'v1'}
-  description: ${data.projectName || 'API'} specification
-servers:
-  - url: https://api.example.com/${data.namespace || 'api'}/${data.majorVersion || 'v1'}
-    description: Production server
-${data.enableWebhooks ? `
-webhooks:
-  newItem:
-    post:
-      requestBody:
-        description: Information about the new item
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                itemId:
-                  type: string
-      responses:
-        '200':
-          description: Webhook processed successfully` : ''}
-paths:
-  /${data.namespace || 'resources'}:
     get:
       summary: Get resources
       responses:
@@ -204,25 +119,27 @@ components:
       required:
         - name
   securitySchemes:
-    ${data.securityScheme || 'BearerAuth'}:
+    BearerAuth:
       type: http
       scheme: bearer`;
-      }
-
-      setSpecContent(templateContent);
-      setFileName(`${data.projectName || 'api'}-spec.yaml`);
-
+          
+      setSpecContent(fallbackSpec);
       try {
-        const parsed = yaml.load(templateContent);
+        const parsed = yaml.load(fallbackSpec);
         setParsedSpec(parsed);
         setError(null);
-      } catch (err) {
-        setError('Error parsing generated YAML: ' + (err as Error).message);
+      } catch (parseErr) {
+        setError('Error parsing specification');
       }
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Load the demo spec initially
+    loadDemoSpec();
+  }, []);
 
   const handleSpecChange = (newContent: string) => {
     setSpecContent(newContent);
@@ -239,28 +156,62 @@ components:
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Update file name and set loading state
     setFileName(file.name);
     setIsLoading(true);
 
+    // Show file information in console to help debug
+    console.log(`Processing file: ${file.name}, type: ${file.type}, size: ${file.size} bytes`);
+
     const reader = new FileReader();
+    
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string;
+        
+        // Log first 100 characters to help debug content
+        console.log(`File content preview: ${content.substring(0, 100)}...`);
+        
+        // Update the spec content in the textarea
         setSpecContent(content);
-        const parsed = yaml.load(content);
+        
+        // Parse the content based on file type
+        let parsed;
+        if (file.name.endsWith('.json')) {
+          parsed = JSON.parse(content);
+        } else {
+          // Assume YAML for .yaml, .yml or any other extension
+          parsed = yaml.load(content);
+        }
+        
+        // Update the parsed spec for the visual view
         setParsedSpec(parsed);
         setError(null);
+        
+        // Switch to 'code' view to show the uploaded content
+        setActiveView('code');
+        
+        // Notify user
+        alert(`Successfully loaded specification from ${file.name}`);
       } catch (err) {
+        console.error('Error processing file:', err);
         setError('Error parsing uploaded file: ' + (err as Error).message);
       } finally {
         setIsLoading(false);
       }
     };
-    reader.onerror = () => {
+    
+    reader.onerror = (event) => {
+      console.error('FileReader error:', event);
       setError('Error reading file');
       setIsLoading(false);
     };
+    
+    // Start reading the file as text
     reader.readAsText(file);
+    
+    // Reset the input value to allow uploading the same file again
+    event.target.value = '';
   };
 
   const downloadSpec = () => {
@@ -289,6 +240,140 @@ components:
   const renderPaths = () => {
     if (!parsedSpec?.paths) return <p>No paths defined</p>;
 
+    const renderParameters = (parameters: any[]) => {
+      if (!parameters || parameters.length === 0) return null;
+      
+      return (
+        <div className="mt-3">
+          <h4 className="text-sm font-medium mb-2">Parameters</h4>
+          <div className="bg-gray-50 p-2 rounded-md">
+            <table className="min-w-full text-xs">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left p-1">Name</th>
+                  <th className="text-left p-1">Location</th>
+                  <th className="text-left p-1">Type</th>
+                  <th className="text-left p-1">Required</th>
+                  <th className="text-left p-1">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {parameters.map((param, idx) => (
+                  <tr key={idx} className="border-b border-gray-100">
+                    <td className="p-1 font-medium">{param.name}</td>
+                    <td className="p-1">{param.in}</td>
+                    <td className="p-1">{param.schema?.type || 'any'}</td>
+                    <td className="p-1">{param.required ? 'Yes' : 'No'}</td>
+                    <td className="p-1">{param.description || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    };
+
+    const renderRequestBody = (requestBody: any) => {
+      if (!requestBody) return null;
+      
+      return (
+        <div className="mt-3">
+          <h4 className="text-sm font-medium mb-2">Request Body</h4>
+          <div className="bg-gray-50 p-3 rounded-md">
+            {requestBody.description && (
+               <div className="text-xs text-gray-600 mb-2">
+               <MarkdownRenderer>{requestBody.description}</MarkdownRenderer>
+             </div>
+            )}
+            {requestBody.required && (
+              <p className="text-xs text-red-600 mb-2">Required</p>
+            )}
+            {requestBody.content && Object.entries(requestBody.content).map(([contentType, contentTypeObj]: [string, any]) => (
+              <div key={contentType} className="mb-2">
+                <span className="text-xs font-medium">Content Type: </span>
+                <span className="text-xs bg-gray-200 px-1 py-0.5 rounded">{contentType}</span>
+                
+                {contentTypeObj.schema && (
+                  <div className="mt-2 text-xs">
+                    <span className="font-medium">Schema: </span>
+                    {contentTypeObj.schema.$ref ? (
+                      <span className="bg-blue-100 text-blue-800 px-1 py-0.5 rounded">
+                        {contentTypeObj.schema.$ref.split('/').pop()}
+                      </span>
+                    ) : (
+                      <span>
+                        {contentTypeObj.schema.type}
+                        {contentTypeObj.schema.format && ` (${contentTypeObj.schema.format})`}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    const renderResponses = (responses: any) => {
+      if (!responses) return null;
+      
+      return (
+        <div className="mt-3">
+          <h4 className="text-sm font-medium mb-2">Responses</h4>
+          <div className="space-y-2">
+            {Object.entries(responses).map(([code, response]: [string, any]) => (
+              <div key={code} className="bg-gray-50 p-2 rounded-md">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`px-2 py-0.5 text-xs font-bold rounded ${
+                    code.startsWith('2') ? 'bg-green-100 text-green-800' :
+                    code.startsWith('4') ? 'bg-yellow-100 text-yellow-800' :
+                    code.startsWith('5') ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {code}
+                  </span>
+                  <div className="text-xs text-gray-600 mb-2">
+                    <MarkdownRenderer>{response.description}</MarkdownRenderer>
+                  </div>
+                </div>
+                
+                {response.content && Object.entries(response.content).map(([contentType, contentTypeObj]: [string, any]) => (
+                  <div key={contentType} className="pl-2 mt-1 text-xs">
+                    <span className="text-xs font-medium">Content Type: </span>
+                    <span className="text-xs bg-gray-200 px-1 py-0.5 rounded">{contentType}</span>
+                    
+                    {contentTypeObj.schema && (
+                      <div className="mt-1 ml-2 text-xs">
+                        <span className="font-medium">Schema: </span>
+                        {contentTypeObj.schema.$ref ? (
+                          <span className="bg-blue-100 text-blue-800 px-1 py-0.5 rounded">
+                            {contentTypeObj.schema.$ref.split('/').pop()}
+                          </span>
+                        ) : contentTypeObj.schema.items && contentTypeObj.schema.items.$ref ? (
+                          <span>
+                            Array of <span className="bg-blue-100 text-blue-800 px-1 py-0.5 rounded">
+                              {contentTypeObj.schema.items.$ref.split('/').pop()}
+                            </span>
+                          </span>
+                        ) : (
+                          <span>
+                            {contentTypeObj.schema.type}
+                            {contentTypeObj.schema.format && ` (${contentTypeObj.schema.format})`}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
     return (
       <div className="space-y-4">
         {Object.entries(parsedSpec.paths).map(([path, methods]: [string, any]) => (
@@ -297,23 +382,45 @@ components:
               <CardTitle className="text-lg text-teal-600">{path}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {Object.entries(methods).map(([method, details]: [string, any]) => (
-                  <div key={`${path}-${method}`} className="p-2 border rounded-md">
+                  <div key={`${path}-${method}`} className="p-3 border rounded-md">
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-1 text-xs font-bold rounded uppercase ${
                         method === 'get' ? 'bg-blue-100 text-blue-800' :
                         method === 'post' ? 'bg-green-100 text-green-800' :
                         method === 'put' ? 'bg-yellow-100 text-yellow-800' :
                         method === 'delete' ? 'bg-red-100 text-red-800' :
+                        method === 'patch' ? 'bg-purple-100 text-purple-800' :
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {method}
                       </span>
                       <span className="font-medium">{details.summary || 'No summary'}</span>
                     </div>
+                    
+
                     {details.description && (
-                      <p className="text-sm text-gray-600 mt-1">{details.description}</p>
+                      <div className="text-xs text-gray-600 mb-2">
+                        <MarkdownRenderer>{details.description}</MarkdownRenderer>
+                      </div>
+                    )}
+                    
+                    {/* For GET operations, show parameters and responses */}
+                    {method.toLowerCase() === 'get' && (
+                      <>
+                        {renderParameters(details.parameters)}
+                        {renderResponses(details.responses)}
+                      </>
+                    )}
+                    
+                    {/* For POST, PUT, PATCH, DELETE operations show request body and responses */}
+                    {['post', 'put', 'patch', 'delete'].includes(method.toLowerCase()) && (
+                      <>
+                        {renderParameters(details.parameters)}
+                        {renderRequestBody(details.requestBody)}
+                        {renderResponses(details.responses)}
+                      </>
                     )}
                   </div>
                 ))}
@@ -324,6 +431,7 @@ components:
       </div>
     );
   };
+
 
   const renderSchemas = () => {
     if (!parsedSpec?.components?.schemas) return <p>No schemas defined</p>;
@@ -376,12 +484,12 @@ components:
             <Button 
               variant="outline" 
               size="icon" 
-              onClick={() => router.push('/api-contracts')}
+              onClick={() => window.history.back()}
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <h1 className="text-3xl font-bold text-teal-600">
-              {contractData?.projectName || parsedSpec?.info?.title || 'API Specification'}
+              {parsedSpec?.info?.title || 'API Specification'}
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -389,7 +497,7 @@ components:
               variant="ghost" 
               size="sm" 
               className="flex items-center gap-1"
-              onClick={() => router.push('/learn/openapi-cheatsheet')}
+              onClick={() => window.location.href = '/learn/openapi-cheatsheet'}
             >
               <BookOpenIcon className="h-4 w-4" />
               <span>OpenAPI Cheatsheet</span>
@@ -436,11 +544,27 @@ components:
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              <div className="px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 hover:bg-primary/90 transition-colors">
+              <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
                 <FileText className="w-4 h-4" />
                 <span>Upload Spec</span>
               </div>
             </label>
+            <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
+                <ShieldCheck className="w-4 h-4" />
+                <span>Validate</span>
+            </div>
+            <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
+                <BadgePercent className="w-4 h-4" />
+                <span>Map to Model</span>
+            </div>
+            <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
+                <Activity className="w-4 h-4" />
+                <span>Bundle</span>
+            </div>
+            <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
+                <Binoculars className="w-4 h-4" />
+                <span>Preview</span>
+            </div>
             <div className="flex p-0.5 bg-gray-100 rounded-md">
               <Button
                 variant={activeView === 'visual' ? 'default' : 'ghost'}
@@ -492,36 +616,47 @@ components:
               <TabsTrigger value="paths">Paths</TabsTrigger>
               <TabsTrigger value="schemas">Schemas</TabsTrigger>
               <TabsTrigger value="security">Security</TabsTrigger>
+              <TabsTrigger value="parameters">Parameters</TabsTrigger>
               {parsedSpec?.webhooks && <TabsTrigger value="webhooks">Webhooks</TabsTrigger>}
             </TabsList>
 
             <TabsContent value="info">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl text-teal-600">API Information</CardTitle>
-                  <CardDescription>Basic information about the API</CardDescription>
+                  <CardTitle className="text-xl text-teal-600">Title</CardTitle>
+                  <CardDescription className="p-2 border rounded text-sm text-gray-600">{parsedSpec?.info?.title || 'No title defined'}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div>
-                      <div className="font-medium">Title</div>
-                      <div>{parsedSpec?.info?.title || 'No title defined'}</div>
+                      <div className="font-medium text-teal-600">Description</div>
+                      <div className="p-2 border rounded text-sm text-gray-600"><MarkdownRenderer>{parsedSpec?.info?.description || 'No description defined'}</MarkdownRenderer></div>
                     </div>
                     <div>
-                      <div className="font-medium">Description</div>
-                      <div>{parsedSpec?.info?.description || 'No description defined'}</div>
+                      <div className="font-medium text-teal-600">Version</div>
+                      <div className="mb-8 flex items-center justify-between">
+                        <div className="p-2 border rounded text-sm text-gray-600">{parsedSpec?.info?.version || 'No version defined'}</div>
+                      </div>
                     </div>
                     <div>
-                      <div className="font-medium">Version</div>
-                      <div>{parsedSpec?.info?.version || 'No version defined'}</div>
+                      <div className="font-medium text-teal-600">Tags</div>
+                      <div className="space-x-2 mb-8 flex items-left">
+                        {parsedSpec?.tags?.map((tag: any, index: number) => (
+                              <div key={index} className="flex p-4 border rounded">
+                                <div className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">{tag.name}</div>
+                                {tag.description && <div className="text-sm text-gray-600">{tag.description}
+                              </div>}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                     <div>
-                      <div className="font-medium">Servers</div>
+                      <div className="font-medium text-teal-600">Servers</div>
                       <div className="space-y-2 mt-2">
                         {parsedSpec?.servers?.map((server: any, index: number) => (
-                          <div key={index} className="p-2 border rounded">
-                            <div className="font-medium">{server.url}</div>
-                            {server.description && <div className="text-sm text-gray-600">{server.description}</div>}
+                          <div key={index} className="bg-gray-100 p-2 border rounded">
+                            <div className="font-medium text-green-800">{server.url}</div>
+                            {server.description && <div className="text-sm text-green-800">{server.description}</div>}
                           </div>
                         ))}
                       </div>
@@ -550,7 +685,7 @@ components:
                     <div className="space-y-4">
                       {Object.entries(parsedSpec.components.securitySchemes).map(([name, scheme]: [string, any]) => (
                         <div key={name} className="p-4 border rounded">
-                          <div className="font-medium text-lg">{name}</div>
+                          <div className="font-medium text-lg text-teal-600">{name}</div>
                           <div className="mt-2 space-y-2">
                             <div>
                               <span className="font-medium">Type:</span>
@@ -580,6 +715,64 @@ components:
                     </div>
                   ) : (
                     <p>No security schemes defined</p>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="parameters">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl text-teal-600">Reusable Parameters</CardTitle>
+                  <CardDescription>Reusable path, query, header and cookie parameters</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {parsedSpec?.components?.parameters ? (
+                    <div className="space-y-4">
+                      {Object.entries(parsedSpec.components.parameters).map(([name, parameter]: [string, any]) => (
+                        <div key={name} className="p-4 border rounded">
+                          <div className="font-medium text-lg text-teal-600">{name}</div>
+                          <div className="mt-2 space-y-2">
+                            <div>
+                              <span className="font-medium">In:</span>
+                              <span className="ml-2">{parameter.in}</span>
+                            </div>
+                            {parameter.description && (
+                              <div>
+                                <span className="font-medium">Description:</span>
+                                <span className="ml-2">{parameter.description }</span>
+                              </div>
+                            )}
+                            {parameter.required && (
+                              <div>
+                                <span className="font-medium">Required:</span>
+                                <span className="ml-2">{parameter.required}</span>
+                              </div>
+                            )}
+                            {parameter.schema && (
+                              <div>
+                                <span className="font-medium">Schema:</span>
+                                <span className="ml-2">{parameter.schema}</span>
+                              </div>
+                            )}
+                            {parameter.example && (
+                              <div>
+                                <span className="font-medium">Sample:</span>
+                                <span className="ml-2">{parameter.example}</span>
+                              </div>
+                            )}
+                            {parameter.examples && (
+                              <div>
+                                <span className="font-medium">Examples:</span>
+                                <span className="ml-2">{parameter.examples}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>No Reusable Parameters defined</p>
                   )}
                 </CardContent>
               </Card>
@@ -632,4 +825,4 @@ components:
   );
 };
 
-export default APISpecVisualizer;
+export default APIDesignEditor;

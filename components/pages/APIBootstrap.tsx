@@ -48,10 +48,10 @@ const securitySchemes = [
   { id: 'none', name: 'No Auth' },
 ];
 
-export const APIContractPage = () => {
+export const APIBootstrap = () => {
   const [enableWebhooks, setEnableWebhooks] = useState(false);
   const [projectName, setProjectName] = useState('');
-  const [projectLocation, setProjectLocation] = useState('/Users/blueseal/workspace/devbox/api/');
+  const [projectLocation, setProjectLocation] = useState('/workspace/api/');
   const [selectedModels, setSelectedModels] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [namespace, setNamespace] = useState('');
@@ -101,7 +101,7 @@ export const APIContractPage = () => {
                       onChange={(e) => {
                         setProjectName(e.target.value);
                       }}
-                      onBlur={(e) => {setProjectLocation(`${projectLocation}${e.target.value}`);}}
+                      onBlur={(e) => {setProjectLocation(`${projectLocation}${e.target.value.toLowerCase().replace(' ', '-')}`);}}
                       />
                     </div>
 
@@ -285,4 +285,4 @@ export const APIContractPage = () => {
   );
 };
 
-export default APIContractPage;
+export default APIBootstrap;

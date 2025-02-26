@@ -1,4 +1,4 @@
 export { DataModelsPage } from './DataModelsPage';
 export { APIContractsPage } from './APIContractsPage';
-export { APIContractPage } from './APIContractPage';
-export { APISpecVisualizer } from './APISpecVisualizer';
+export { APIBootstrap } from './APIBootstrap';
+export { APIDesignEditor } from './APIDesignEditor';
