@@ -1,0 +1,731 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PaymentInstruction",
+  "description": "Payment instruction domain model",
+  "type": "object",
+  "required": ["requestedExecutionDate", "paymentIdentifiers", "value", "transferType", "paymentType"],
+  "properties": {
+    "requestedExecutionDate": {
+      "type": "string",
+      "format": "date",
+      "description": "The date when the payment should be executed"
+    },
+    "paymentIdentifiers": {
+      "type": "object",
+      "required": ["endToEndId"],
+      "properties": {
+        "endToEndId": {
+          "type": "string",
+          "description": "End-to-end identifier for the payment"
+        },
+        "otherPaymentReferences": {
+          "type": "object",
+          "properties": {
+            "relatedReferenceId": {
+              "type": "string"
+            },
+            "uetr": {
+              "type": "string",
+              "description": "Unique End-to-End Transaction Reference"
+            }
+          }
+        }
+      }
+    },
+    "value": {
+      "type": "object",
+      "required": ["currency", "amount"],
+      "properties": {
+        "currency": {
+          "type": "string",
+          "description": "The currency code of the payment amount"
+        },
+        "amount": {
+          "type": "string",
+          "description": "The payment amount"
+        }
+      }
+    },
+    "transferType": {
+      "type": "string",
+      "enum": ["CREDIT"],
+      "description": "The type of transfer"
+    },
+    "paymentType": {
+      "type": "string",
+      "enum": ["DEFAULT"],
+      "description": "The type of payment"
+    },
+    "paymentTypeInformation": {
+      "type": "object",
+      "properties": {
+        "serviceLevelCode": {
+          "type": "string",
+          "description": "Service level code for the payment"
+        },
+        "localInstrumentCode": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "proprietary": {
+              "type": "string"
+            }
+          }
+        },
+        "paymentContext": {
+          "type": "string",
+          "description": "Context of the payment"
+        }
+      }
+    },
+    "debtor": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "type": "object",
+          "properties": {
+            "accountNumber": {
+              "type": "string",
+              "description": "Account number of the debtor"
+            },
+            "accountType": {
+              "type": "string",
+              "enum": ["DDA"],
+              "description": "Type of the account"
+            },
+            "accountCurrency": {
+              "type": "string",
+              "description": "Currency of the account"
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the debtor"
+        },
+        "postalAddress": {
+          "$ref": "#/definitions/postalAddress"
+        },
+        "contactDetails": {
+          "type": "object",
+          "properties": {
+            "phoneNumber": {
+              "type": "string"
+            },
+            "mobileNumber": {
+              "type": "string"
+            },
+            "faxNumber": {
+              "type": "string"
+            },
+            "emailAddress": {
+              "type": "string"
+            },
+            "emailPurpose": {
+              "type": "string"
+            },
+            "jobTitle": {
+              "type": "string"
+            },
+            "responsibility": {
+              "type": "string"
+            },
+            "department": {
+              "type": "string"
+            }
+          }
+        },
+        "dateAndPlaceOfBirth": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string"
+            },
+            "countrySubDivision": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            },
+            "birthDate": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        },
+        "countryOfResidence": {
+          "type": "string"
+        },
+        "device": {
+          "type": "object",
+          "properties": {
+            "ipAddress": {
+              "type": "string"
+            },
+            "geoCoordinates": {
+              "type": "object"
+            }
+          }
+        },
+        "partyId": {
+          "type": "object",
+          "properties": {
+            "organizationIds": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "schemeName": {
+                    "type": "object",
+                    "properties": {
+                      "proprietary": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "debtorAgent": {
+      "$ref": "#/definitions/financialInstitution"
+    },
+    "creditor": {
+      "type": "object"
+    },
+    "creditorAgent": {
+      "$ref": "#/definitions/financialInstitution"
+    },
+    "additionalParties": {
+      "type": "object",
+      "properties": {
+        "ultimateDebtor": {
+          "$ref": "#/definitions/party"
+        },
+        "ultimateCreditor": {
+          "$ref": "#/definitions/party"
+        },
+        "initiatingParty": {
+          "type": "object",
+          "properties": {
+            "organizationIds": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "instructedAgent": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "idType": {
+              "type": "string"
+            },
+            "branchNumber": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalDebtors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "financialInstitutionIds": {
+                "type": "array",
+                "items": {}
+              },
+              "postalAddress": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "additionalCreditors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "financialInstitutionIds": {
+                "type": "array",
+                "items": {}
+              },
+              "postalAddress": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "intermediaryAgents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "financialInstitutionIds": {
+                "type": "array",
+                "items": {}
+              },
+              "postalAddress": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "paymentPurpose": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "proprietary": {
+              "type": "string"
+            }
+          }
+        },
+        "categoryPurpose": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "proprietary": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "remittanceInformation": {
+      "type": "object",
+      "properties": {
+        "unstructuredInformation": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "structuredInformation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "creditReference": {
+                "type": "object"
+              },
+              "referredDocumentInformation": {
+                "type": "object"
+              },
+              "referredDocumentAmount": {
+                "type": "array",
+                "items": {}
+              },
+              "deliveryDetails": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "agentInstructions": {
+          "type": "object",
+          "properties": {
+            "nextAgentInstructions": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "creditorAgentInstructions": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "debtorAgentInstructions": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "foreignCurrency": {
+          "type": "string"
+        },
+        "fx": {
+          "type": "object",
+          "properties": {
+            "appliedRate": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "taxInformation": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "taxAmount": {
+          "type": "object",
+          "properties": {
+            "currency": {
+              "type": "string"
+            },
+            "amount": {
+              "type": "string"
+            }
+          }
+        },
+        "creditorTaxInformation": {
+          "type": "object",
+          "properties": {
+            "taxId": {
+              "type": "string"
+            },
+            "taxpayerCategory": {
+              "type": "string",
+              "enum": ["INDIVIDUAL"]
+            }
+          }
+        },
+        "debtorTaxInformation": {
+          "type": "object",
+          "properties": {
+            "taxId": {
+              "type": "string"
+            },
+            "taxpayerCategory": {
+              "type": "string",
+              "enum": ["INDIVIDUAL"]
+            }
+          }
+        }
+      }
+    },
+    "regulatoryReporting": {
+      "type": "object",
+      "properties": {
+        "authority": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            }
+          }
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "additionalInfo": {
+                "type": "array",
+                "items": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "settlementInformation": {
+      "type": "object",
+      "properties": {
+        "settlementAccount": {
+          "type": "object",
+          "properties": {
+            "accountNumber": {
+              "type": "string"
+            },
+            "accountType": {
+              "type": "string",
+              "enum": ["DDA"]
+            },
+            "accountCurrency": {
+              "type": "string"
+            },
+            "companyId": {
+              "type": "string"
+            }
+          }
+        },
+        "interbankSettlementAmount": {
+          "type": "object",
+          "properties": {
+            "currency": {
+              "type": "string"
+            },
+            "amount": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "mandateInformation": {
+      "type": "object",
+      "properties": {
+        "mandateId": {
+          "type": "string"
+        },
+        "sequenceType": {
+          "type": "string",
+          "enum": ["FIRST"]
+        },
+        "signatureDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "electronicSignature": {
+          "type": "string"
+        },
+        "amendmentInformation": {
+          "type": "object",
+          "properties": {
+            "originalMandateId": {
+              "type": "string"
+            },
+            "originalCreditorId": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "organizationIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "organizationId": {
+                        "type": "string"
+                      },
+                      "schemeName": {
+                        "type": "object",
+                        "properties": {
+                          "proprietary": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "originalDebtor": {
+              "type": "object",
+              "properties": {
+                "accountNumber": {
+                  "type": "string"
+                },
+                "accountType": {
+                  "type": "string",
+                  "enum": ["DDA"]
+                },
+                "accountCurrency": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "fxInformation": {
+      "type": "object",
+      "properties": {
+        "exchangeRate": {
+          "type": "string"
+        },
+        "exchangeRateType": {
+          "type": "string",
+          "enum": ["SPOT"]
+        },
+        "rateId": {
+          "type": "string"
+        },
+        "contractId": {
+          "type": "string"
+        },
+        "appliedRate": {
+          "type": "string"
+        }
+      }
+    },
+    "secureVerification": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "secret": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "paymentExpiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Expiration date and time for the payment"
+    },
+    "chargesInformation": {
+      "type": "object",
+      "properties": {
+        "chargeBearer": {
+          "type": "string",
+          "enum": ["CREDITOR"]
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "currency": {
+              "type": "string"
+            },
+            "amount": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "postalAddress": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "addressType": {
+          "type": "string"
+        },
+        "addressLines": {
+          "type": "array",
+          "items": {
+            "type": ["string", "null"]
+          }
+        },
+        "buildingNumber": {
+          "type": "string"
+        },
+        "streetName": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "countrySubDivision": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      }
+    },
+    "financialInstitution": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "financialInstitutionIds": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "postalAddress": {
+          "$ref": "#/definitions/postalAddress"
+        },
+        "additionalInstitutions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "postalAddress": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "party": {
+      "type": "object",
+      "properties": {
+        "individualIds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "individualId": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "postalAddress": {
+          "type": "object",
+          "properties": {
+            "addressType": {
+              "type": "string"
+            },
+            "streetName": {
+              "type": "string"
+            },
+            "buildingNumber": {
+              "type": "string"
+            },
+            "postalCode": {
+              "type": "string"
+            },
+            "city": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            },
+            "countrySubDivision": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

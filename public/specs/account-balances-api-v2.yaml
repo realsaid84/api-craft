@@ -1,0 +1,640 @@
+openapi: 3.0.0
+info:
+  title: Account Balances API
+  description: Account Balances API allows J.P. Morgan clients to retrieve their Balance information.
+  version: 2.0.7
+  contact:
+    name: JPMorgan Chase & Co. API Support
+    email: imsd.security.operations@jpmorgan.com
+    url: https://developer.payments.jpmorgan.com/contact/support
+  license:
+    name: Contact JPMorgan Chase & Co. API Support for licensing terms.
+    url: https://developer.payments.jpmorgan.com/contact/support
+servers:
+  - url: https://api.payments.jpmorgan.com/account/v2
+    description: PROD
+  - url: https://api-mock.payments.jpmorgan.com/account/v2
+    description: PROD - Accounts API Sandbox
+security:
+  - BearerAuth: []
+tags:
+  - name: Balances
+    description: Balance Information
+paths:
+  /accounts/balances:
+    get:
+      summary: Retrieve Balances of All Eligible Accounts
+      description: "Returns the current date balances of all eligible accounts\n\nThe following constraints apply when sending requests to this endpoint:  \n- Supported J.P. Morgan account type(s) :BDA \n- The maximum number of accounts (pageSize) that can be returned in single API call is 100. If the pageSize is not provided, the default is 25 accounts."
+      operationId: getAccountsBalances
+      tags:
+        - Balances
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Successful Account Balances Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountBalances'
+              examples:
+                Example-Account-Balances-Response-Current-Day-US:
+                  $ref: '#/components/examples/Account-Balances-Response-Current-Day-US'
+        '400':
+          description: "Bad Request \n\nList of error codes and usage descriptions\n  | Error Code        |            Usage            |  \n  |-------------------|-----------------------------|\n  | `10001`           | Mandatory field missing     | \n  | `10002`           | Minimum length violation \t  |     \n  | `10003`           | Maximum length violation\t  |  \n  | `10100`           | Minimum value violation     |   \n  | `10101`           | Maximum value violation     | \n  | `10102`           | Range violation             |  \n  | `10103`           | Bad format                  |  \n  | `10104`           | Bad value                   |  \n  | `10105`           | Unexpected field            |  \n  | `10199`           | Other                       |  "
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: "Forbidden. \n| Error Code    | Description                                |\n|---------------|--------------------------------------------|\n|  14000        | Security failure                           | "
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /accounts/balances/inquiry:
+    post:
+      summary: Inquire Balances
+      description: "Returns the historical day account balances that match valid request criteria. The following constraints apply when sending requests to this endpoint: \n- Supported J.P. Morgan account type(s) : BDA \n- The API supports the retrieval of account balances data for up to 45 days for BDA\n- When querying using date range (fromDate & toDate), the range can not exceed 45 days\n- The dates queried represent the current business day of the location of an account \n- The maximum number of accounts (pageSize) that can be returned in single API call is 100. If the pageSize is not provided, the default is 25 accounts."
+      operationId: inquireAccountsBalances
+      tags:
+        - Balances
+      parameters:
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BalanceInquiry'
+            examples:
+              BalanceInquiry-Current-Day-US:
+                $ref: '#/components/examples/BalanceInquiry-Current-Day-Example-US'
+              BalanceInquiry-Historical-Day-US:
+                $ref: '#/components/examples/BalanceInquiry-Historical-Day-Example-US'
+      responses:
+        '200':
+          description: Successful Account Balances Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountBalances'
+              examples:
+                Example-Account-Balances-Response-Current-Day-US:
+                  $ref: '#/components/examples/Account-Balances-Response-Current-Day-US'
+                Example-Account-Balances-Response-Historical-Day-US:
+                  $ref: '#/components/examples/Account-Balances-Response-Historical-Day-US'
+                Empty-Account-Balances-Response:
+                  $ref: '#/components/examples/Empty-Account-Balances-Response'
+        '400':
+          description: "Bad Request. \n        List of error codes and usage descriptions\n   \n  | Error Code        |            Usage            |  \n  |-------------------|-----------------------------|\n  | `10001`           | Mandatory field missing     | \n  | `10002`           | Minimum length violation \t  |     \n  | `10003`           | Maximum length violation\t  |  \n  | `10100`           | Minimum value violation     |   \n  | `10101`           | Maximum value violation     | \n  | `10102`           | Range violation             |  \n  | `10103`           | Bad format                  |  \n  | `10104`           | Bad value                   |  \n  | `10105`           | Unexpected field            |  \n  | `10199`           | Other                       |  "
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: "Forbidden \n| Error Code    | Description                                |\n|---------------|--------------------------------------------|\n|  14000        | Security failure                           | "
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AccountsInquiry:
+      type: object
+      title: AccountsInquiry
+      description: Accounts schema used to provide the inquiry criteria based on which account information is retrieved
+      properties:
+        accountIdentifiers:
+          type: array
+          description: List of account numbers and financial institutions
+          items:
+            $ref: '#/components/schemas/NumberAndFinancialInstitution'
+          minItems: 1
+          maxItems: 100
+      required:
+        - accountIdentifiers
+    AccountsResponse:
+      type: object
+      title: AccountsResponse
+      required:
+        - accounts
+        - metadata
+      properties:
+        accounts:
+          type: array
+          minItems: 0
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Account'
+        metadata:
+          type: object
+          title: Account Metadata
+          required:
+            - cursor
+          properties:
+            cursor:
+              $ref: '#/components/schemas/Cursor'
+    Account:
+      type: object
+      title: Account
+      description: An account object contains the customer account related properties
+      required:
+        - number
+        - type
+        - currency
+        - financialInstitutionIds
+      properties:
+        number:
+          type: string
+          description: "JPMorgan account number\n\n**Maximum length supported for different accounts**:\n\n  | Account Type               \t| Maximum length limits  |\n  |-----------------------------|------------------------|\n  | BDA                         | 10                     |"
+          minLength: 1
+          maxLength: 10
+        type:
+          $ref: '#/components/schemas/AccountType'
+        name:
+          type: string
+          description: Account legal name as provided by customer
+        currency:
+          $ref: '#/components/schemas/ISOCurrencyCode'
+        financialInstitutionIds:
+          type: array
+          description: Bank or Financial Institution identifier
+          items:
+            $ref: '#/components/schemas/FinancialInstitution'
+          minItems: 1
+          maxItems: 1
+    NumberAndFinancialInstitution:
+      type: object
+      title: NumberAndFinancialInstitution
+      description: Customer account number and Financial Institution (Bank) information
+      properties:
+        number:
+          type: string
+          description: "JPMorgan account number\n\n**Maximum length supported for different accounts**:\n\n  | Account Type               \t| Maximum length limits  |\n  |-----------------------------|------------------------|\n  | BDA                         | 10                     |"
+          minLength: 1
+          maxLength: 10
+        financialInstitutionId:
+          $ref: '#/components/schemas/FinancialInstitution'
+      required:
+        - number
+        - financialInstitutionId
+    AlternateAccountIdentifier:
+      type: object
+      title: AlternateAccountIdentifier
+      description: An alternate form of identifier that can be used to identify the customer account
+      properties:
+        id:
+          type: string
+          description: Alternate account identifier
+        idType:
+          type: string
+          description: The identifier type
+          enum:
+            - IBAN
+      required:
+        - id
+        - idType
+    AccountType:
+      type: string
+      description: The type of account
+    AccountIdentifier:
+      type: object
+      description: Contains account number and financial institution to uniquely identify a customer account
+      properties:
+        number:
+          type: string
+          description: Account number
+          minLength: 1
+          maxLength: 10
+        financialInstitutionId:
+          type: object
+          title: FinancialInstitution
+          description: Financial institution identifier
+          required:
+            - id
+            - idType
+          properties:
+            id:
+              type: string
+              description: Bank or Financial institution identifier
+              minLength: 8
+              maxLength: 11
+            idType:
+              $ref: '#/components/schemas/IdType'
+      required:
+        - number
+        - financialInstitutionId
+    FinancialInstitution:
+      type: object
+      title: FinancialInstitution
+      description: Financial Institution identifier
+      required:
+        - id
+        - idType
+      properties:
+        id:
+          type: string
+          description: Bank or Financial Institution identifier
+          minLength: 8
+          maxLength: 11
+        name:
+          type: string
+          description: Name of the Bank or Financial Institution
+        idType:
+          $ref: '#/components/schemas/IdType'
+    IdType:
+      type: string
+      description: The Id type of the Bank or Financial Institution
+      enum:
+        - BIC
+    BalanceInquiry:
+      type: object
+      title: BalanceInquiry
+      description: Balance schema used to provide the inquiry criteria based on which balance information is retrieved
+      properties:
+        accountIdentifiers:
+          type: array
+          description: List of account numbers
+          items:
+            $ref: '#/components/schemas/AccountIdentifier'
+          minItems: 1
+          maxItems: 25
+        balanceTypes:
+          type: array
+          description: "Optional list of balance types for filtering balances\n  \n***Refer the section below for the supported balance types*** \n \n***Account Types: BDA***\n  \n Applicable balance types for historical balance requests\n  - CLOSING_AVAILABLE\n - CLOSING_BOOKED\n  Applicable balance types for same day balance requests\n - INTERIM_AVAILABLE\n  - INTERIM_BOOKED"
+          items:
+            type: string
+          minItems: 1
+          maxItems: 4
+        fromDate:
+          type: string
+          format: date
+          description: "The earliest date balances should be returned\n \n By default this will be the current business day of the location of an account\n   \n***MUST be used in combination with toDate. Where only fromDate is provided the toDate will be fromDate + 45days. Must follow ISO 8601 date format e.g YYYY-MM-DD***"
+        toDate:
+          type: string
+          format: date
+          description: "Used to specify the latest date balances should be returned \n \n By default this will be the current business day of the location of an account  \n \n***MUST be used in combination with fromDate. Where only toDate is provided the fromDate will be toDate - 45 days. Must follow ISO 8601 date format e.g YYYY-MM-DD***"
+      required:
+        - accountIdentifiers
+    AccountBalances:
+      type: object
+      title: AccountBalances
+      properties:
+        accountBalances:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountBalance'
+          minItems: 0
+          maxItems: 99
+        metadata:
+          type: object
+          title: Metadata
+          properties:
+            cursor:
+              $ref: '#/components/schemas/Cursor'
+      required:
+        - accountBalances
+        - metadata
+    AccountBalance:
+      type: object
+      title: AccountBalance
+      description: Account balance information
+      properties:
+        account:
+          $ref: '#/components/schemas/Account'
+        balances:
+          type: array
+          description: List of balances captured based on posting dates
+          items:
+            $ref: '#/components/schemas/Balance'
+          minItems: 1
+          maxItems: 100
+      required:
+        - account
+        - balances
+    Balance:
+      type: object
+      title: Balance
+      properties:
+        type:
+          type: string
+          description: "Balance types\n \n***Refer the section below for the supported balance types***   \n ***Account Types: BDA*** \n \n  Applicable balance types for historical balance requests\n - CLOSING_AVAILABLE\n  - CLOSING_BOOKED\n Applicable balance types for same day balance requests\n     \n- INTERIM_AVAILABLE\n    \n- INTERIM_BOOKED\n"
+        bookDate:
+          type: string
+          format: date
+          description: This is the date when the balance will be booked.
+        amount:
+          $ref: '#/components/schemas/SignedDecimal'
+      required:
+        - type
+        - bookDate
+        - amount
+    ISOCurrencyCode:
+      description: ISO 4217 Alpha-3 Currency Code
+      type: string
+      minLength: 3
+      maxLength: 3
+      pattern: ^[A-Z]{3}$
+      example: USD
+    SignedDecimal:
+      description: "A String representation of a (potential) decimal number  \n  \n**Follows ISO 4217 standards to represent minor unit currencies**"
+      type: string
+      minLength: 1
+      maxLength: 100
+      pattern: ^[+-]?\d+(\.\d+)?$
+      example: '-123.45'
+    Cursor:
+      type: object
+      title: Cursor
+      required:
+        - this
+        - first
+      properties:
+        first:
+          $ref: '#/components/schemas/CursorId'
+        prev:
+          $ref: '#/components/schemas/CursorId'
+        this:
+          $ref: '#/components/schemas/CursorId'
+        next:
+          $ref: '#/components/schemas/CursorId'
+        goodUntil:
+          type: string
+          format: date-time
+    CursorId:
+      type: string
+      description: For selecting a cursor when using pagination
+      minLength: 1
+      maxLength: 50
+    PageSize:
+      type: integer
+      format: int32
+      minimum: 1
+      maximum: 100
+      default: 25
+      description: For pagination, the total number of results to return
+    Error:
+      type: object
+      title: Error
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 99
+          description: Short human readable title of the error
+        httpStatus:
+          type: integer
+          format: int32
+          description: Should be identical to the HTTP status code of the response
+        traceId:
+          type: string
+          minLength: 1
+          maxLength: 99
+          description: JPMC assigned traced identifier
+        requestId:
+          type: string
+          minLength: 1
+          maxLength: 99
+          description: Client generated identifier for the current request invocation
+        context:
+          type: array
+          minItems: 1
+          maxItems: 99
+          items:
+            $ref: '#/components/schemas/ErrorContext'
+    ErrorContext:
+      type: object
+      title: ErrorContext
+      description: |-
+        The following is a list of error codes that may be returned and their associated rule definitions
+        | Error Code | Definition |
+        | --- | --- |
+        | **10001** | Mandatory field is missing |
+        | **10002** | Minimum length violation |
+        | **10003** | Maximum length violation |
+        | **10100** | Minimum value violation |
+        | **10101** | Maximum value violation |
+        | **10102** | Range violation |
+        | **10103** | Bad Format |
+        | **10104** | Bad Value |
+        | **10105** | Unexpected Field |
+        | **10199** | Other |
+      required:
+        - message
+      properties:
+        code:
+          type: string
+          minLength: 5
+          maxLength: 5
+          description: JPMC Short code that identifies the error - publicly cataloged and documented
+        message:
+          type: string
+          minLength: 1
+          maxLength: 99
+          description: Human readable textual description of the error
+        field:
+          type: string
+          minLength: 1
+          maxLength: 99
+          description: The field name causing the error
+        location:
+          type: string
+          description: The part of the request the error is located
+          enum:
+            - BODY
+            - PATH
+            - QUERY
+            - HEADER
+  examples:
+    AccountsList-Response-US:
+      value:
+        accounts:
+          - number: '1234567890'
+            type: BDA
+            currency: USD
+            name: Customer BDA Account
+            financialInstitutionIds:
+              - id: CHASUS33MCY
+                idType: BIC
+        metadata:
+          cursor:
+            first: 9c0af3e7-0375-4343-a8bb-a2fc9ee51621
+            this: 9c0af3e7-0375-4343-a8bb-a2fc9ee51621
+    AccountsListInquiryResponse:
+      value:
+        accounts:
+          - number: '1234567890'
+            type: BDA
+            currency: USD
+            name: Customer BDA Account
+            financialInstitutionIds:
+              - id: CHASUS33MCY
+                idType: BIC
+        metadata:
+          cursor:
+            first: 9c0af3e7-0375-4343-a8bb-a2fc9ee51621
+            this: 9c0af3e7-0375-4343-a8bb-a2fc9ee51621
+    Account-Balances-Response-Current-Day-US:
+      value:
+        accountBalances:
+          - account:
+              number: '1234567890'
+              type: BDA
+              currency: USD
+              name: Customer BDA Account
+              financialInstitutionIds:
+                - id: CHASUS33MCY
+                  idType: BIC
+            balances:
+              - type: INTERIM_AVAILABLE
+                amount: '5000.00'
+                bookDate: '2024-10-06'
+              - type: INTERIM_BOOKED
+                amount: '5000.00'
+                bookDate: '2024-10-06'
+        metadata:
+          cursor:
+            first: 9c0af3e7-0375-4343-a8bb-a2fc9ee51621
+            this: 9c0af3e7-0375-4343-a8bb-a2fc9ee51621
+            goodUntil: '2024-10-06T00:00:00.000Z'
+    Account-Balances-Response-Historical-Day-US:
+      value:
+        accountBalances:
+          - account:
+              number: '1234567890'
+              type: BDA
+              currency: USD
+              name: Customer BDA Account
+              financialInstitutionIds:
+                - id: CHASUS33MCY
+                  idType: BIC
+            balances:
+              - type: CLOSING_AVAILABLE
+                amount: '5000.00'
+                bookDate: '2024-10-05'
+              - type: CLOSING_BOOKED
+                amount: '5000.00'
+                bookDate: '2024-10-05'
+              - type: CLOSING_AVAILABLE
+                amount: '5000.00'
+                bookDate: '2024-10-04'
+              - type: CLOSING_BOOKED
+                amount: '5000.00'
+                bookDate: '2024-10-04'
+        metadata:
+          cursor:
+            first: 9c0af3e7-0375-4343-a8bb-a2fc9ee51621
+            this: 9c0af3e7-0375-4343-a8bb-a2fc9ee51621
+            goodUntil: '2024-10-05T00:00:00.000Z'
+    Empty-Accounts-Response:
+      value:
+        accounts: []
+        metadata:
+          cursor:
+            first: 00000000-0000-0000-0000-000000000000
+            this: 00000000-0000-0000-0000-000000000000
+    Empty-Account-Balances-Response:
+      value:
+        accountBalances: []
+        metadata:
+          cursor:
+            first: 00000000-0000-0000-0000-000000000000
+            this: 00000000-0000-0000-0000-000000000000
+    AccountsInquiry-Example:
+      value:
+        accountIdentifiers:
+          - number: '1234567890'
+            financialInstitutionId:
+              id: CHASUS33MCY
+              idType: BIC
+    BalanceInquiry-Current-Day-Example-US:
+      value:
+        accountIdentifiers:
+          - number: '1234567890'
+            financialInstitutionId:
+              id: CHASUS33MCY
+              idType: BIC
+    BalanceInquiry-Historical-Day-Example-US:
+      value:
+        accountIdentifiers:
+          - number: '1234567890'
+            financialInstitutionId:
+              id: CHASUS33MCY
+              idType: BIC
+        fromDate: '2024-10-04'
+        toDate: '2024-10-05'
+  parameters:
+    PageSize:
+      name: pageSize
+      in: query
+      description: For pagination, the total number of results to return
+      required: false
+      schema:
+        $ref: '#/components/schemas/PageSize'
+    Cursor:
+      name: cursor
+      in: query
+      description: For selecting a cursor when using pagination
+      required: false
+      schema:
+        type: string
+        format: uuid
+    RequestId:
+      name: Request-Id
+      in: header
+      description: "Client provided identifier used to distinguish and track individual requests.  \n***When provided in the request, the id is also returned in the response during error cases for troubleshooting. Our recommendation is to use UUIDv4***"
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 36
+x-jpmc-securityDefinitions:
+  JPMC-OAuth2: {}
+x-jpmc-security: {}

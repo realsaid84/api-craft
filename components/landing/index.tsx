@@ -55,7 +55,7 @@ export const Sidebar = () => {
     {
       title: 'PERFORM',
       items: [
-        { name: 'Routine Actions', path: '/pages/perform/routine' },
+        { name: 'Routine Actions', path: '/pages/perform/routine-actions' },
         { name: 'Preview', path: '/pages/design/api-editor' },
         { name: 'Code Gen', path: '/pages/perform/codegen' }
       ]
@@ -74,15 +74,18 @@ export const Sidebar = () => {
   return (
     <div className="w-64 min-h-screen bg-background border-r">
       <div className="p-6 border-b">
-        <div className="flex items-center justify-center mb-2">
-          <div className="w-8 h-8 relative">
-            <div className="absolute inset-0 bg-teal-500 opacity-60 transform rotate-45"></div>
-            <div className="absolute inset-0 bg-teal-500 opacity-75 transform rotate-90"></div>
-          </div>
+      <div className="flex items-center justify-center mb-2">
+        <div className="w-32 h-32 relative">
+          <img 
+            src="/assets/DAPA2.jpeg" 
+            alt="DAPA Icon" 
+            className="absolute inset-0 w-full h-full object-contain"
+          />
         </div>
+      </div>
         <a href="/" className="inline-block hover:opacity-80 transition-opacity">
             <h1 className="text-center text-xl font-bold text-gray-700">
-              API Craft Accelerator
+              DATA & API Accelerator Studio
             </h1>
         </a>
         <p className="text-center text-sm text-gray-400">Quick Tour</p>
@@ -180,7 +183,7 @@ const MainContent = () => {
       icon: Heart,
       title: "Perform API Route-to-Live Lifecycle Actions →",
       description: "Perform routine API delivery lifecycle actions such as Code Gen, Bundling, Proxying and mocking.",
-      link: "/perform/routine"
+      link: "/pages/perform/routine-actions"
     }
   ];
 
@@ -197,20 +200,23 @@ const MainContent = () => {
           </p>
           <div className="flex gap-4">
             <Button asChild>
-              <a href="/discover/data-models">Get Started</a>
+              <a href="/pages/discover/data-models">Get Started</a>
             </Button>
             <Button variant="outline" asChild>
-              <a href="/learn/openapi-cheatsheet">Learn OpenAPI</a>
+              <a href="/learn/openapi-cheatsheet">API Education</a>
             </Button>
             <Button variant="outline" asChild>
-              <a href="/learn/openapi-workshop">Take a Workshop</a>
-            </Button>
-            <Button variant="outline" asChild>
-              <a href="/discover/components">Discover API Common Components</a>
-            </Button>
-            <Button variant="outline" asChild>
-              <a href="/discover/dictionaries">Discover Data Dictionaries and existing API contracts</a>
+              <a href="/discover/dictionaries">Reusable Data Models</a>
             </Button> 
+            <Button variant="outline" asChild>
+              <a href="/pages/discover/api-contracts">APIs</a>
+            </Button>
+            <Button variant="outline" asChild>
+              <a href="/pages/discover/components">API Common Components and Templates</a>
+            </Button>
+            <Button variant="outline" asChild>
+              <a href="/pages/perform/routine-actions">Lifecycle actions</a>
+            </Button>
           </div>
         </div>
 

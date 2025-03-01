@@ -10,11 +10,7 @@ export interface DataModel {
     lastModified: string;
     owner: string;
     tags: string[];
-    schema: {
-      type: string;
-      format?: string;
-      properties?: Record<string, unknown>;
-    };
+    schema: string;
   }
   
   export interface DataModelFilter {

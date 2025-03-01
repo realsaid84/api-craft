@@ -1,0 +1,247 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Account Domain Model",
+  "type": "object",
+  "properties": {
+    "Account": {
+      "type": "object",
+      "properties": {
+        "accountIdentifier": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "accountState": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "accountType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "balance": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AccountBalance"
+          }
+        },
+        "bankId": {
+          "$ref": "#/definitions/Party"
+        },
+        "branchId": {
+          "$ref": "#/definitions/Party"
+        },
+        "currency": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "number": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "number"
+      ]
+    },
+    "AccountBalance": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "$ref": "#/definitions/Account"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "asOfBusinessDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "balanceDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "balanceState": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "balanceType": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "lastUpdatedDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "positionType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "accountId",
+        "amount",
+        "balanceDate",
+        "balanceType",
+        "id"
+      ]
+    },
+    "Party": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "channel": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contact": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "financialInformation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "partyAlternateIdentifier": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "partyIdentifier": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "partyName": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "partyType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "paymentInstrument": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "website": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "websiteAvailable": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "PartyAccountRole": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "$ref": "#/definitions/Account"
+        },
+        "partyId": {
+          "$ref": "#/definitions/Party"
+        },
+        "role": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "accountId",
+        "partyId",
+        "role"
+      ]
+    },
+    "PartyAssignedRole": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  "definitions": {
+    "Account": {},
+    "AccountBalance": {},
+    "Party": {},
+    "PartyAccountRole": {},
+    "PartyAssignedRole": {}
+  }
+}

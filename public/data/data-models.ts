@@ -1,7 +1,7 @@
 // data/data-models.ts
 import { DataModel } from '@/components/types/data-models';
 
-export const DataModels: DataModel[] = [
+export const sampleDataModels: DataModel[] = [
     {
       id: '1',
       name: 'Payment Instruction',
@@ -12,14 +12,7 @@ export const DataModels: DataModel[] = [
       lastModified: '2024-01-20',
       owner: 'Treasury Team',
       tags: ['payment', 'core', 'transaction'],
-      schema: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          amount: { type: 'number' },
-          currency: { type: 'string' }
-        }
-      }
+      schema: '/data/payment-instruction-domain-model.json'
     },
     {
       id: '2',
@@ -31,14 +24,7 @@ export const DataModels: DataModel[] = [
       lastModified: '2024-01-15',
       owner: 'Treasury Team',
       tags: ['account', 'treasury'],
-      schema: {
-        type: 'object',
-        properties: {
-          accountNumber: { type: 'string' },
-          type: { type: 'string' },
-          currency: { type: 'string' }
-        }
-      }
+      schema: '/data/account-domain-model.json'
     },
     {
       id: '3',
@@ -50,14 +36,7 @@ export const DataModels: DataModel[] = [
       lastModified: '2024-01-18',
       owner: 'Finance Team',
       tags: ['accounting', 'reconciliation', 'treasury'],
-      schema: {
-        type: 'object',
-        properties: {
-          entryId: { type: 'string' },
-          amount: { type: 'number' },
-          postingDate: { type: 'string', format: 'date' }
-        }
-      }
+      schema: '/data/account-domain-model.json'
     },
     {
       id: '4',
@@ -69,14 +48,7 @@ export const DataModels: DataModel[] = [
       lastModified: '2024-01-10',
       owner: 'Treasury Team',
       tags: ['balance', 'real-time', 'position'],
-      schema: {
-        type: 'object',
-        properties: {
-          accountId: { type: 'string' },
-          balance: { type: 'number' },
-          timestamp: { type: 'string', format: 'date-time' }
-        }
-      }
+      schema: '/data/account-domain-model.json'
     },
     {
       id: '5',
@@ -88,14 +60,7 @@ export const DataModels: DataModel[] = [
       lastModified: '2024-01-12',
       owner: 'Receivables Domain',
       tags: ['invoice', 'receivables', 'payment'],
-      schema: {
-        type: 'object',
-        properties: {
-          invoiceId: { type: 'string' },
-          dueDate: { type: 'string', format: 'date' },
-          status: { type: 'string' }
-        }
-      }
+      schema: '/data/payment-instruction-domain-model.json'
     },
     {
       id: '6',
@@ -107,14 +72,7 @@ export const DataModels: DataModel[] = [
       lastModified: '2024-01-19',
       owner: 'Global Liquidity and Accounts',
       tags: ['liquidity', 'forecast', 'cash-flow'],
-      schema: {
-        type: 'object',
-        properties: {
-          forecastId: { type: 'string' },
-          periodStart: { type: 'string', format: 'date' },
-          forecastAmount: { type: 'number' }
-        }
-      }
+      schema: '/data/account-domain-model.json'
     },
     {
       id: '7',
@@ -126,14 +84,7 @@ export const DataModels: DataModel[] = [
       lastModified: '2024-01-17',
       owner: 'Treasury Services',
       tags: ['payment', 'schedule', 'recurring'],
-      schema: {
-        type: 'object',
-        properties: {
-          scheduleId: { type: 'string' },
-          frequency: { type: 'string' },
-          nextDate: { type: 'string', format: 'date' }
-        }
-      }
+      schema: '/data/payment-instruction-domain-model.json'
     },
     {
       id: '8',
@@ -145,14 +96,7 @@ export const DataModels: DataModel[] = [
       lastModified: '2024-01-16',
       owner: 'Global Liquidity and Accounts',
       tags: ['statement', 'reconciliation', 'treasury'],
-      schema: {
-        type: 'object',
-        properties: {
-          statementId: { type: 'string' },
-          accountId: { type: 'string' },
-          period: { type: 'string' }
-        }
-      }
+      schema: '/data/account-domain-model.json'
     },
     {
       id: '9',
@@ -164,14 +108,7 @@ export const DataModels: DataModel[] = [
       lastModified: '2024-01-14',
       owner: 'Integration Team',
       tags: ['gateway', 'integration', 'config'],
-      schema: {
-        type: 'object',
-        properties: {
-          gatewayId: { type: 'string' },
-          settings: { type: 'object' },
-          status: { type: 'string' }
-        }
-      }
+      schema: '/data/payment-instruction-domain-model.json'
     },
     {
       id: '10',
@@ -183,13 +120,6 @@ export const DataModels: DataModel[] = [
       lastModified: '2024-01-13',
       owner: 'Risk Team',
       tags: ['limits', 'risk', 'compliance'],
-      schema: {
-        type: 'object',
-        properties: {
-          limitId: { type: 'string' },
-          thresholds: { type: 'object' },
-          currency: { type: 'string' }
-        }
-      }
+      schema: '/data/account-domain-model.json'
     }
   ] as const;

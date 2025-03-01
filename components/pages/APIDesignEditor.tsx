@@ -30,6 +30,9 @@ import {
 } from 'lucide-react';
 import * as yaml from 'js-yaml';
 import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { xonokai } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
 
 const MarkdownRenderer: React.FC<{ children: string }> = ({ children }) => (
   <ReactMarkdown>{children}</ReactMarkdown>
@@ -561,10 +564,12 @@ components:
                 <Activity className="w-4 h-4" />
                 <span>Bundle</span>
             </div>
-            <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
+            <a href="/pages/design/api-visualizer" className="no-underline">
+              <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
                 <Binoculars className="w-4 h-4" />
                 <span>Preview</span>
-            </div>
+              </div>
+            </a>
             <div className="flex p-0.5 bg-gray-100 rounded-md">
               <Button
                 variant={activeView === 'visual' ? 'default' : 'ghost'}
@@ -601,12 +606,40 @@ components:
           </div>
         ) : activeView === 'code' ? (
           <Card>
-            <CardContent className="pt-6">
-              <textarea
-                value={specContent}
-                onChange={(e) => handleSpecChange(e.target.value)}
-                className="w-full h-[70vh] font-mono text-sm p-4 bg-gray-50 border rounded focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
+            <CardContent className="pt-6"> 
+            <div className="w-full h-[70vh] font-mono text-sm border rounded focus-within:ring-2 focus-within:ring-teal-500 overflow-hidden relative">
+              <div className="absolute top-0 left-0 w-full h-full overflow-auto" style={{ backgroundColor: '#1e1e1e' }}>
+                <SyntaxHighlighter
+                  language="yaml"
+                  style={xonokai}
+                  customStyle={{
+                    margin: 0,
+                    padding: '16px',
+                    minHeight: '100%',
+                    width: '100%',
+                    backgroundColor: '#1e1e1e',
+                    overflow: 'visible'
+                  }}
+                  wrapLines={true}
+                  lineProps={{ style: { wordBreak: 'break-all', whiteSpace: 'pre-wrap' } }}
+                >
+                  {specContent}
+                </SyntaxHighlighter>
+                <textarea
+                  value={specContent}
+                  onChange={(e) => handleSpecChange(e.target.value)}
+                  className="absolute top-0 left-0 w-full h-full font-mono text-sm p-4 border-none resize-none focus:outline-none z-10"
+                  spellCheck="false"
+                  style={{
+                    color: 'transparent',
+                    caretColor: 'white',
+                    backgroundColor: 'transparent',
+                    overflow: 'auto'
+                  }}
+                />
+              </div>
+            </div>
+
             </CardContent>
           </Card>
         ) : (
@@ -740,31 +773,31 @@ components:
                             {parameter.description && (
                               <div>
                                 <span className="font-medium">Description:</span>
-                                <span className="ml-2">{parameter.description }</span>
+                                <div className="p-2 border rounded text-sm text-gray-600">{parameter.description }</div>
                               </div>
                             )}
                             {parameter.required && (
                               <div>
                                 <span className="font-medium">Required:</span>
-                                <span className="ml-2">{parameter.required}</span>
+                                <span className="ml-2">true</span>
                               </div>
                             )}
                             {parameter.schema && (
                               <div>
                                 <span className="font-medium">Schema:</span>
-                                <span className="ml-2">{parameter.schema}</span>
+                                <div className="p-2 border rounded text-sm text-gray-600">{JSON.stringify(parameter.schema, null, 2)}</div>
                               </div>
                             )}
                             {parameter.example && (
                               <div>
                                 <span className="font-medium">Sample:</span>
-                                <span className="ml-2">{parameter.example}</span>
+                                <span className="ml-2">{JSON.stringify(parameter.example, null, 2)}</span>
                               </div>
                             )}
                             {parameter.examples && (
                               <div>
                                 <span className="font-medium">Examples:</span>
-                                <span className="ml-2">{parameter.examples}</span>
+                                <span className="ml-2">{JSON.stringify(parameter.examples, null, 2)}</span>
                               </div>
                             )}
                           </div>

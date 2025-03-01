@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import { Info, Home, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
