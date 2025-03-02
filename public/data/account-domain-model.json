@@ -13,15 +13,16 @@
           }
         },
         "accountState": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "accountType": {
-          "type": [
-            "string",
-            "null"
+          "type": "string",
+          "enum": [
+            "DDA",
+            "VAM",
+            "CARD",
+            "BDA",
+            "OTHER"
           ]
         },
         "balance": {
@@ -37,19 +38,13 @@
           "$ref": "#/definitions/Party"
         },
         "currency": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "id": {
           "type": "string"
         },
         "name": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "number": {
           "type": "string"
@@ -78,10 +73,7 @@
           "format": "date"
         },
         "balanceState": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "balanceType": {
           "type": "string"
@@ -115,10 +107,7 @@
           }
         },
         "channel": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "contact": {
           "type": "array",
@@ -127,10 +116,7 @@
           }
         },
         "financialInformation": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "id": {
           "type": "string"
@@ -154,40 +140,22 @@
           }
         },
         "partyType": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "paymentInstrument": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "role": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "status": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "website": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "websiteAvailable": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         }
       },
       "required": [
@@ -217,16 +185,10 @@
       "type": "object",
       "properties": {
         "code": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "description": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "name": {
           "type": "string"

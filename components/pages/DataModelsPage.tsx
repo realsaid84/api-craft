@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Search, Filter, Plus, Table, Grid, Download, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +16,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { DataModel, DataModelFilter } from '@/components/types/data-models';
 import { sampleDataModels } from '@/public/data/data-models';
-
 
 // Empty State Component
 const EmptyState = ({ message }: { message: string }) => (
@@ -40,10 +40,13 @@ const ErrorAlert = ({ message }: { message: string }) => (
   </Alert>
 );
 
-const DataModelCard = ({ model }: { model: DataModel }) => {
+const DataModelCard = ({ model, onClick }: { model: DataModel; onClick: (model: DataModel) => void }) => {
   try {
     return (
-      <Card className="block p-6 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
+      <Card 
+        className="block p-6 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors cursor-pointer"
+        onClick={() => onClick(model)}
+      >
         <CardHeader>
           <div className="flex justify-between items-start">
             <div>
@@ -94,6 +97,7 @@ const DataModelCard = ({ model }: { model: DataModel }) => {
 };
 
 export const DataModelsPage = () => {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [filter, setFilter] = useState<DataModelFilter>({
     search: '',
@@ -138,6 +142,11 @@ export const DataModelsPage = () => {
     }
   };
 
+  const handleModelClick = (model: DataModel) => {
+    // Navigate to the data model view page with the model ID as a query parameter
+    router.push(`/pages/discover/data-model-view?id=${model.id}&schemaUrl=${encodeURIComponent(model.schema)}`);
+  };
+
   if (error) {
     return <ErrorAlert message={error} />;
   }
@@ -146,144 +155,149 @@ export const DataModelsPage = () => {
     <div className="flex-1 overflow-auto">
       <div className="max-w-6xl mx-auto p-8">
         <div className="mb-12">
-        <h1 className="text-4xl font-bold text-teal-600">Data Models</h1>
-        <p className="text-xl text-muted-foreground mb-6">
-          Discover and manage reusable data models across your organization.
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-8">
-        <div className="flex justify-between items-right p-8">
-          <div className="flex-1 flex gap-4 items-center">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search data models..."
-                className="pl-10"
-                value={filter.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-              />
-            </div>
-            
-            <Select
-              value={filter.domain || 'all'}
-              onValueChange={(value) => handleFilterChange('domain', value)}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="domain" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="Payment">Payment</SelectItem>
-                <SelectItem value="Account">Account</SelectItem>
-                <SelectItem value="Receivables">Receivables</SelectItem>
-                <SelectItem value="Risk">Risk</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={filter.status || 'all'}
-              onValueChange={(value) => handleFilterChange('status', value)}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="Draft">Draft</SelectItem>
-                <SelectItem value="Published">Published</SelectItem>
-                <SelectItem value="Deprecated">Deprecated</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex gap-4">
-            <div className="flex gap-2 border rounded-md p-1">
-              <Button
-                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-                size="icon"
-                onClick={() => setViewMode('grid')}
-              >
-                <Grid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'table' ? 'secondary' : 'ghost'}
-                size="icon"
-                onClick={() => setViewMode('table')}
-              >
-                <Table className="h-4 w-4" />
-              </Button>
-            </div>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              New Model
-            </Button>
-          </div>
+          <h1 className="text-4xl font-bold text-teal-600">Data Models</h1>
+          <p className="text-xl text-muted-foreground mb-6">
+            Discover and manage reusable data models across your organization.
+          </p>
         </div>
 
-        {isLoading ? (
-          <div className="text-center py-10">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        <div className="flex flex-col gap-8">
+          <div className="flex justify-between items-right p-8">
+            <div className="flex-1 flex gap-4 items-center">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search data models..."
+                  className="pl-10"
+                  value={filter.search}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
+                />
+              </div>
+              
+              <Select
+                value={filter.domain || 'all'}
+                onValueChange={(value) => handleFilterChange('domain', value)}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="domain" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="Payment">Payment</SelectItem>
+                  <SelectItem value="Account">Account</SelectItem>
+                  <SelectItem value="Receivables">Receivables</SelectItem>
+                  <SelectItem value="Risk">Risk</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={filter.status || 'all'}
+                onValueChange={(value) => handleFilterChange('status', value)}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="Draft">Draft</SelectItem>
+                  <SelectItem value="Published">Published</SelectItem>
+                  <SelectItem value="Deprecated">Deprecated</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex gap-2 border rounded-md p-1">
+                <Button
+                  variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+                  size="icon"
+                  onClick={() => setViewMode('grid')}
+                >
+                  <Grid className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'table' ? 'secondary' : 'ghost'}
+                  size="icon"
+                  onClick={() => setViewMode('table')}
+                >
+                  <Table className="h-4 w-4" />
+                </Button>
+              </div>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                New Model
+              </Button>
+            </div>
           </div>
-        ) : filteredModels.length === 0 ? (
-          <EmptyState 
-            message={filter.search || filter.domain || filter.status ? 
-              "No data models match your filters. Try adjusting your search criteria." : 
-              "No data models available. Create your first data model to get started."}
-          />
-        ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ml-4">
-            {filteredModels.map((model) => (
-              <DataModelCard key={model.id} model={model} />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-lg border bg-card">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="py-3 px-4 text-left font-medium">Name</th>
-                  <th className="py-3 px-4 text-left font-medium">Domain</th>
-                  <th className="py-3 px-4 text-left font-medium">Status</th>
-                  <th className="py-3 px-4 text-left font-medium">Version</th>
-                  <th className="py-3 px-4 text-left font-medium">Last Modified</th>
-                  <th className="py-3 px-4 text-left font-medium">Owner</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredModels.map((model) => (
-                  <tr key={model.id} className="border-b last:border-0">
-                    <td className="py-3 px-4">
-                      <div>
-                        <div className="text-lg text-teal-600 font-medium
-                        
-                        
-                        ">{model.name}</div>
-                        <div className="text-sm text-muted-foreground">{model.description}</div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">{model.domain}</td>
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        model.status === 'Published' ? 'bg-green-100 text-green-800' :
-                        model.status === 'Draft' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {model.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">{model.version}</td>
-                    <td className="py-3 px-4">{model.lastModified}</td>
-                    <td className="py-3 px-4">{model.owner}</td>
+
+          {isLoading ? (
+            <div className="text-center py-10">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            </div>
+          ) : filteredModels.length === 0 ? (
+            <EmptyState 
+              message={filter.search || filter.domain || filter.status ? 
+                "No data models match your filters. Try adjusting your search criteria." : 
+                "No data models available. Create your first data model to get started."}
+            />
+          ) : viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ml-4">
+              {filteredModels.map((model) => (
+                <DataModelCard key={model.id} model={model} onClick={handleModelClick} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-lg border bg-card">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="py-3 px-4 text-left font-medium">Name</th>
+                    <th className="py-3 px-4 text-left font-medium">Domain</th>
+                    <th className="py-3 px-4 text-left font-medium">Status</th>
+                    <th className="py-3 px-4 text-left font-medium">Version</th>
+                    <th className="py-3 px-4 text-left font-medium">Last Modified</th>
+                    <th className="py-3 px-4 text-left font-medium">Owner</th>
+                    <th className="py-3 px-4 text-left font-medium">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody>
+                  {filteredModels.map((model) => (
+                    <tr key={model.id} className="border-b last:border-0 hover:bg-accent/50 cursor-pointer" onClick={() => handleModelClick(model)}>
+                      <td className="py-3 px-4">
+                        <div>
+                          <div className="text-lg text-teal-600 font-medium">{model.name}</div>
+                          <div className="text-sm text-muted-foreground">{model.description}</div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">{model.domain}</td>
+                      <td className="py-3 px-4">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          model.status === 'Published' ? 'bg-green-100 text-green-800' :
+                          model.status === 'Draft' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {model.status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">{model.version}</td>
+                      <td className="py-3 px-4">{model.lastModified}</td>
+                      <td className="py-3 px-4">{model.owner}</td>
+                      <td className="py-3 px-4">
+                        <Button variant="ghost" size="sm" onClick={(e) => {
+                          e.stopPropagation();
+                          handleModelClick(model);
+                        }}>
+                          View Schema
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
-    </div>
   );
-  
 };

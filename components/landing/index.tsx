@@ -153,19 +153,19 @@ const MainContent = () => {
       icon: FileSearch,
       title: "Discover Reusable Data Models →",
       description: "Search your entire data ecosystem, including dashboards, datasets, ML models, and raw files.",
-      link: "/discover/data-models"
+      link: "/pages/discover/data-models"
     },
     {
       icon: Settings,
       title: "Discover API Common Components and Contracts →",
       description: "Discover API common components, Templates and existing contracts.",
-      link: "/discover/components"
+      link: "/pages/discover/components"
     },
     {
       icon: ShieldCheck,
       title: "Data and API Quality Control →",
       description: "Improve data and API quality through metadata tests, assertions, governance validations, and conformance checks.",
-      link: "/observe/data-quality"
+      link: "/pages/observe/data-quality"
     },
     {
       icon: Code,
