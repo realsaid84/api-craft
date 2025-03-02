@@ -199,6 +199,72 @@
       ]
     }
   },
+  "example":{
+    "Account": {
+      "id": "ACC123456",
+      "number": "9876543210",
+      "accountIdentifier": ["IBAN123456", "SWIFT98765"],
+      "accountState": "Active",
+      "accountType": "DDA",
+      "balance": [
+        {
+          "id": "BAL001",
+          "accountId": "ACC123456",
+          "amount": 5000.75,
+          "asOfBusinessDate": "2025-03-01",
+          "balanceDate": "2025-03-01",
+          "balanceState": "Available",
+          "balanceType": "Current",
+          "lastUpdatedDateTime": "2025-03-01T10:15:30Z",
+          "positionType": "Credit"
+        }
+      ],
+      "bankId": {
+        "id": "BANK123",
+        "partyName": ["Global Bank"],
+        "partyType": "Bank",
+        "status": "Active"
+      },
+      "branchId": {
+        "id": "BRANCH001",
+        "partyName": ["Main Street Branch"],
+        "partyType": "Branch",
+        "status": "Active"
+      },
+      "currency": "USD",
+      "name": "John Doe Checking Account"
+    },
+    "AccountBalance": {
+      "id": "BAL002",
+      "accountId": "ACC123456",
+      "amount": 12000.50,
+      "asOfBusinessDate": "2025-03-01",
+      "balanceDate": "2025-03-01",
+      "balanceState": "Pending",
+      "balanceType": "Savings",
+      "lastUpdatedDateTime": "2025-03-01T11:00:00Z",
+      "positionType": "Credit"
+    },
+    "Party": {
+      "id": "CUST001",
+      "partyName": ["John Doe"],
+      "partyType": "Individual",
+      "status": "Active",
+      "address": ["123 Main St, New York, NY"],
+      "contact": ["john.doe@example.com", "+1234567890"],
+      "role": "Account Holder"
+    },
+    "PartyAccountRole": {
+      "accountId": "ACC123456",
+      "partyId": "CUST001",
+      "role": "Owner"
+    },
+    "PartyAssignedRole": {
+      "name": "Primary Account Holder",
+      "code": "PAH001",
+      "description": "The main individual responsible for the account."
+    }
+  },
   "definitions": {
     "Account": {},
     "AccountBalance": {},

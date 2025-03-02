@@ -618,6 +618,104 @@
       }
     }
   },
+  "example":{
+    "requestedExecutionDate": "2024-10-22",
+    "paymentIdentifiers": {
+      "endToEndId": "AD202109311354152"
+    },
+    "transferType": "CREDIT",
+    "value": {
+      "currency": "GBP",
+      "amount": "650"
+    },
+    "paymentType": "RTP",
+    "debtor": {
+      "account": {
+        "accountNumber": "12311871",
+        "accountCurrency": "GBP",
+        "accountType": "DDA"
+      }
+    },
+    "debtorAgent": {
+      "financialInstitutionIds": [
+        {
+          "id": "CHASGB2L",
+          "idType": "BIC"
+        }
+      ]
+    },
+    "creditor": {
+      "account": {
+        "accountNumber": "87654321"
+      },
+      "name": "Emily Davis",
+      "postalAddress": {
+        "type": "BIZZ",
+        "streetName": "Fratton Park",
+        "buildingNumber": "411",
+        "postalCode": "PO48RA",
+        "city": "Portsmouth",
+        "country": "GB",
+        "countrySubDivision": "HAM"
+      }
+    },
+    "creditorAgent": {
+      "financialInstitutionIds": [
+        {
+          "id": "CHASGB2L",
+          "idType": "BIC"
+        }
+      ]
+    },
+    "additionalParties": {
+      "ultimateDebtor": {
+        "organizationIds": [
+          {
+            "organizationId": "40025916",
+            "bic": "CHASGB2L"
+          }
+        ],
+        "name": "Wayne Thompson",
+        "countryOfResidence": "GB",
+        "postalAddress": {
+          "type": "BIZZ",
+          "streetName": "Lennon Road",
+          "buildingNumber": "22",
+          "city": "Liverpool",
+          "country": "GB"
+        }
+      },
+      "ultimateCreditor": {
+        "individualIds": [
+          {
+            "individualId": "87654321"
+          }
+        ],
+        "name": "Aisha Khan",
+        "postalAddress": {
+          "type": "BIZZ",
+          "streetName": "Fratton Park",
+          "buildingNumber": "411",
+          "postalCode": "PO48RA",
+          "city": "Portsmouth",
+          "country": "GB",
+          "countrySubDivision": "HAM"
+        }
+      }
+    },
+    "paymentPurpose": {
+      "purpose": {
+        "code": "GDDS"
+      }
+    },
+    "remittanceInformation": {
+      "unstructuredInformation": [
+        {
+          "text": "Payment for Macbook batteries Receipt #AXF23-LGG"
+        }
+      ]
+    }
+  },
   "definitions": {
     "postalAddress": {
       "type": "object",
