@@ -1,4 +1,4 @@
-import React, { Children, useState } from 'react';
+import React, { useState } from 'react';
 import { 
   ChevronDown, 
   ChevronRight,
@@ -15,7 +15,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 
-// Add to CollapsibleSidebar.tsx
 interface CollapsibleSidebarProps {
   children?: React.ReactNode;
 }
@@ -24,15 +23,16 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({ children }) => 
   const [collapsed, setCollapsed] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
  
-// Icon mapping for section titles
-const sectionIcons: Record<string, React.ReactNode> = {
-  'LEARN': <BookOpen className="h-5 w-5" />,
-  'DISCOVER': <Search className="h-5 w-5" />,
-  'OBSERVE': <Shield className="h-5 w-5" />,
-  'DESIGN': <Settings className="h-5 w-5" />,
-  'PERFORM': <Activity className="h-5 w-5" />,
-  'TEST': <Code className="h-5 w-5" />,
-};
+  // Icon mapping for section titles
+  const sectionIcons: Record<string, React.ReactNode> = {
+    'LEARN': <BookOpen className="h-5 w-5" />,
+    'DISCOVER': <Search className="h-5 w-5" />,
+    'OBSERVE': <Shield className="h-5 w-5" />,
+    'DESIGN': <Settings className="h-5 w-5" />,
+    'PERFORM': <Activity className="h-5 w-5" />,
+    'TEST': <Code className="h-5 w-5" />,
+  };
+
   const menuSections = [
     {
       title: 'LEARN',
@@ -135,44 +135,36 @@ const sectionIcons: Record<string, React.ReactNode> = {
           {menuSections.map((section) => (
             <div key={section.title} className="mb-2">
               {collapsed ? (
-                <div className="flex items-center gap-2">
-                 {/* Section Icon */}
-                 {section.icon && (
-                  <div className="text-teal-500">
-                    {section.icon}
-                  </div>
-                )}
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  className="w-full flex justify-center py-2"
+                  className="w-full flex justify-center items-center py-2"
                   title={section.title}
                 >
-                  {section.title.charAt(0)}
-                </Button>
-                </div>
-              ) : (
-                <>
-                <div className="flex items-center gap-2">
-                 {/* Section Icon */}
-                 {section.icon && (
                   <div className="text-teal-500">
                     {section.icon}
                   </div>
-                )}
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="w-full flex justify-between items-center py-2 px-3"
-                    onClick={() => toggleSection(section.title)}
-                  >
-                    <span className="text-teal-500 text-xs font-semibold">{section.title}</span>
-                    <ChevronDown 
-                      className={`h-3 w-3 text-gray-500 transition-transform ${
-                        expandedSection === section.title ? 'transform rotate-180' : ''
-                      }`} 
-                    />
-                  </Button>
+                </Button>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    {/* Section Icon */}
+                    <div className="text-teal-500">
+                      {section.icon}
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="w-full flex justify-between items-center py-2 px-3"
+                      onClick={() => toggleSection(section.title)}
+                    >
+                      <span className="text-teal-500 text-xs font-semibold">{section.title}</span>
+                      <ChevronDown 
+                        className={`h-3 w-3 text-gray-500 transition-transform ${
+                          expandedSection === section.title ? 'transform rotate-180' : ''
+                        }`} 
+                      />
+                    </Button>
                   </div>
                   {expandedSection === section.title && (
                     <div className="ml-2 space-y-1 mt-1">
