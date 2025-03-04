@@ -144,7 +144,7 @@ export const DataModelsPage = () => {
 
   const handleModelClick = (model: DataModel) => {
     // Navigate to the data model view page with the model ID as a query parameter
-    router.push(`/pages/discover/data-model-view?id=${model.id}&schemaUrl=${encodeURIComponent(model.schema)}`);
+    router.push(`/pages/discover/data-model-view?id=${model.id}&schemaUrl=${encodeURIComponent(model.schema)}&modelUrl=${encodeURIComponent(model.erDiagram)}`);
   };
 
   if (error) {

@@ -1,8 +1,8 @@
 // app/pages/discover/layout.tsx
 'use client';
 
-import DiscoveryLayout from '@/components/layouts/MainLayout';
+import ObserveLayout from '@/components/layouts/MainLayout';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <DiscoveryLayout>{children}</DiscoveryLayout>;
+  return <ObserveLayout>{children}</ObserveLayout>;
 }

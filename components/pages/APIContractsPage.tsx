@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Filter, Plus, Table, Grid, Download, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, Eye, Plus, Table, Grid, Download, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -15,6 +16,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { APIContractModel, APIContractModelFilter } from '@/components/types/api-contracts';
 import { apiContractModels } from '@/public/data/api-models';
+
 
 // Empty State Component
 const EmptyState = ({ message }: { message: string }) => (
@@ -39,10 +41,11 @@ const ErrorAlert = ({ message }: { message: string }) => (
   </Alert>
 );
 
-const APIModelCard = ({ model }: { model: APIContractModel }) => {
+const APIModelCard = ({ model, onClick, router }: { model: APIContractModel; onClick: (model: APIContractModel, router: any) => void; router: any }) => {
   try {
     return (
-      <Card className="block p-6 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
+      <Card className="block p-6 rounded-lg border bg-card text-card-foreground  hover:bg-accent/50 transition-colors cursor-pointer"
+        onClick={() => handleModelClick(model, router)}>
         <CardHeader>
           <div className="flex justify-between items-start">
             <div>
@@ -78,8 +81,10 @@ const APIModelCard = ({ model }: { model: APIContractModel }) => {
             <div className="flex justify-between items-center text-sm text-muted-foreground">
               <span>Updated {model.lastModified}</span>
               <span>{model.owner}</span>
-            <Button variant="outline" asChild>
-                    <a href={model.schema}>{'>>'}</a>
+            <Button  size="sm" className="flex items-center gap-1" 
+                variant="outline" asChild 
+                onClick={() => handleModelClick(model, router)}>
+             <span>More →</span>
             </Button>
             </div>
           </div> 
@@ -99,7 +104,14 @@ const APIModelCard = ({ model }: { model: APIContractModel }) => {
   }
 };
 
+const handleModelClick = (model: APIContractModel, router: ReturnType<typeof useRouter>) => {
+  // Navigate to the API visualizer page with model ID and schema URL as query parameters
+  router.push(`/pages/design/api-visualizer?id=${model.id}&schemaUrl=${encodeURIComponent(model.schema)}`);
+};
+
+
 export const APIContractsPage = () => {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [filter, setFilter] = useState<APIContractModelFilter>({
     search: '',
@@ -146,6 +158,7 @@ export const APIContractsPage = () => {
       setError('There was an error updating the filters.');
     }
   };
+
 
   if (error) {
     return <ErrorAlert message={error} />;
@@ -246,7 +259,7 @@ export const APIContractsPage = () => {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ml-4">
             {filteredModels.map((model) => (
-              <APIModelCard key={model.id} model={model} />
+              <APIModelCard key={model.id} model={model} onClick={handleModelClick} router={router} />
             ))}
           </div>
         ) : (
@@ -264,7 +277,7 @@ export const APIContractsPage = () => {
               </thead>
               <tbody>
                 {filteredModels.map((model) => (
-                  <tr key={model.id} className="border-b last:border-0">
+                   <tr key={model.id} className="border-b last:border-0 hover:bg-accent/50 cursor-pointer" onClick={() => handleModelClick(model, router)}>
                     <td className="py-3 px-4">
                       <div>
                         <div className="text-lg text-teal-600 font-medium

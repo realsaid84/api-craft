@@ -12,7 +12,7 @@ export const apiContractModels: APIContractModel[] = [
     lastModified: '2024-01-20',
     owner: 'Treasury Services',
     tags: ['payment', 'core'],
-    schema: '/public/specs/global-payments-api-v1.yaml'
+    schema: '/specs/global-payments-api-v1.yaml'
   },
   {
     id: '2',
@@ -24,7 +24,7 @@ export const apiContractModels: APIContractModel[] = [
     lastModified: '2024-01-20',
     owner: 'Treasury Services',
     tags: ['payment', 'core'],
-    schema: '/public/specs/global-payments-api-v2.yaml'
+    schema: '/specs/global-payments-api-v2.yaml'
   },
 
   {
@@ -37,7 +37,7 @@ export const apiContractModels: APIContractModel[] = [
     lastModified: '2025-01-20',
     owner: 'Treasury Services',
     tags: ['payment', 'account', 'balances', 'liquidity'],
-    schema: '/public/specs/account-balances-api-v2.yaml'
+    schema: '/specs/account-balances-api-v2.yaml'
   },
   {
     id: '4',
@@ -49,7 +49,7 @@ export const apiContractModels: APIContractModel[] = [
     lastModified: '2024-01-20',
     owner: 'Treasury Services',
     tags: ['payment', 'reports', 'accounts', 'transactions'],
-    schema: '/public/specs/open-api-demo.yaml'
+    schema: '/specs/open-api-demo.yaml'
   },
   {
     id: '5',
@@ -61,7 +61,7 @@ export const apiContractModels: APIContractModel[] = [
     lastModified: '2024-12-02',
     owner: 'Treasury Services',
     tags: ['payment', 'reports', 'accounts', 'transactions'],
-    schema: '/public/specs/pay-by-bank-api-v2.yaml'
+    schema: '/specs/pay-by-bank-api-v2.yaml'
   },
   {
     id: '6',
@@ -73,7 +73,7 @@ export const apiContractModels: APIContractModel[] = [
     lastModified: '2020-12-02',
     owner: 'Treasury Services',
     tags: ['payment', 'core'],
-    schema: '/public/specs/open-api-demo.yaml'
+    schema: '/specs/open-api-demo.yaml'
   },
   {
     id: '7',
@@ -85,6 +85,6 @@ export const apiContractModels: APIContractModel[] = [
     lastModified: '2020-12-02',
     owner: 'Treasury Services',
     tags: ['risk', 'core'],
-    schema: '/public/specs/open-api-demo.yaml'
+    schema: '/specs/open-api-demo.yaml'
   }
 ] as const;

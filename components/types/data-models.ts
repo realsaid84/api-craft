@@ -11,6 +11,7 @@ export interface DataModel {
     owner: string;
     tags: string[];
     schema: string;
+    erDiagram: string;
   }
   
   export interface DataModelFilter {

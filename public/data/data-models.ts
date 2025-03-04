@@ -12,7 +12,8 @@ export const sampleDataModels: DataModel[] = [
       lastModified: '2024-01-20',
       owner: 'Treasury Team',
       tags: ['payment', 'core', 'transaction'],
-      schema: '/data/payment-instruction-domain-model.json'
+      schema: '/data/payment-instruction-domain-model.json',
+      erDiagram: '/data/payment_instruction_domain_model.md'
     },
     {
       id: '2',
@@ -24,7 +25,8 @@ export const sampleDataModels: DataModel[] = [
       lastModified: '2024-01-15',
       owner: 'Treasury Team',
       tags: ['account', 'treasury'],
-      schema: '/data/account-domain-model.json'
+      schema: '/data/account-domain-model.json',
+      erDiagram: '/data/account_domain_model.md'
     },
     {
       id: '3',
@@ -36,7 +38,8 @@ export const sampleDataModels: DataModel[] = [
       lastModified: '2024-01-18',
       owner: 'Finance Team',
       tags: ['accounting', 'reconciliation', 'treasury'],
-      schema: '/data/account-domain-model.json'
+      schema: '/data/account-domain-model.json',
+      erDiagram: '/data/account_domain_model.md'
     },
     {
       id: '4',
@@ -48,7 +51,8 @@ export const sampleDataModels: DataModel[] = [
       lastModified: '2024-01-10',
       owner: 'Treasury Team',
       tags: ['balance', 'real-time', 'position'],
-      schema: '/data/account-domain-model.json'
+      schema: '/data/account-domain-model.json',
+      erDiagram: '/data/account_domain_model.md'
     },
     {
       id: '5',
@@ -60,7 +64,8 @@ export const sampleDataModels: DataModel[] = [
       lastModified: '2024-01-12',
       owner: 'Receivables Domain',
       tags: ['invoice', 'receivables', 'payment'],
-      schema: '/data/payment-instruction-domain-model.json'
+      schema: '/data/payment-instruction-domain-model.json',
+      erDiagram: '/data/payment_instruction_domain_model.md'
     },
     {
       id: '6',
@@ -72,7 +77,8 @@ export const sampleDataModels: DataModel[] = [
       lastModified: '2024-01-19',
       owner: 'Global Liquidity and Accounts',
       tags: ['liquidity', 'forecast', 'cash-flow'],
-      schema: '/data/account-domain-model.json'
+      schema: '/data/account-domain-model.json',
+      erDiagram: '/data/payment_instruction_domain_model.md'
     },
     {
       id: '7',
@@ -84,7 +90,8 @@ export const sampleDataModels: DataModel[] = [
       lastModified: '2024-01-17',
       owner: 'Treasury Services',
       tags: ['payment', 'schedule', 'recurring'],
-      schema: '/data/payment-instruction-domain-model.json'
+      schema: '/data/payment-instruction-domain-model.json',
+      erDiagram: '/data/payment_instruction_domain_model.md'
     },
     {
       id: '8',
@@ -96,7 +103,8 @@ export const sampleDataModels: DataModel[] = [
       lastModified: '2024-01-16',
       owner: 'Global Liquidity and Accounts',
       tags: ['statement', 'reconciliation', 'treasury'],
-      schema: '/data/account-domain-model.json'
+      schema: '/data/account-domain-model.json',
+      erDiagram: '/data/account_domain_model.md'
     },
     {
       id: '9',
@@ -108,7 +116,8 @@ export const sampleDataModels: DataModel[] = [
       lastModified: '2024-01-14',
       owner: 'Integration Team',
       tags: ['gateway', 'integration', 'config'],
-      schema: '/data/payment-instruction-domain-model.json'
+      schema: '/data/payment-instruction-domain-model.json',
+      erDiagram: '/data/payment_instruction_domain_model.md'
     },
     {
       id: '10',
@@ -120,6 +129,7 @@ export const sampleDataModels: DataModel[] = [
       lastModified: '2024-01-13',
       owner: 'Risk Team',
       tags: ['limits', 'risk', 'compliance'],
-      schema: '/data/account-domain-model.json'
+      schema: '/data/account-domain-model.json',
+      erDiagram: '/data/account_domain_model.md'
     }
   ] as const;

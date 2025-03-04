@@ -19,7 +19,7 @@ import {
   Download,
   AlertCircle,
   Copy,
-  Search,
+  AlertTriangle,
   ArrowLeft,
   BookOpen,
   BookOpen as BookOpenIcon,
@@ -45,6 +45,7 @@ export const APIDesignEditor = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [fileName, setFileName] = useState<string>('api-specification.yaml');
+  const [warningCount] = useState(1);
 
   // Load demo OpenAPI spec from file
   const loadDemoSpec = async () => {
@@ -521,6 +522,14 @@ components:
               <Copy className="h-4 w-4" />
               <span>Copy</span>
             </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+            >
+              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              <span>{warningCount} Warning</span>
+            </Button>
           </div>
         </div>
 
@@ -549,20 +558,12 @@ components:
               />
               <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
                 <FileText className="w-4 h-4" />
-                <span>Upload Spec</span>
+                <span>Import Spec</span>
               </div>
             </label>
             <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
                 <ShieldCheck className="w-4 h-4" />
                 <span>Validate</span>
-            </div>
-            <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
-                <BadgePercent className="w-4 h-4" />
-                <span>Map to Model</span>
-            </div>
-            <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
-                <Activity className="w-4 h-4" />
-                <span>Bundle</span>
             </div>
             <a href="/pages/design/api-visualizer" className="no-underline">
               <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">

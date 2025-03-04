@@ -4,151 +4,117 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  FileText,
   Code,
   Eye,
-  Save,
   Download,
   AlertCircle,
   Copy,
-  Search,
   ArrowLeft,
   BookOpen,
-  BookOpen as BookOpenIcon,
   ShieldCheck,
   BadgePercent,
   Activity,
-  Binoculars
+  Binoculars,
+  Loader2,
+  AlertTriangle,
+  Upload,
+  CheckCheck
 } from 'lucide-react';
 import * as yaml from 'js-yaml';
-import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { xonokai } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { RedocStandalone } from 'redoc'
+import { RedocStandalone } from 'redoc';
+import { useRouter } from 'next/navigation';
 
+interface APIVisualizerProps {
+  schemaData?: any;  // Can be a string (YAML/JSON) or parsed object
+  isLoading?: boolean;
+  error?: string | null;
+  modelName?: string;
+  title?: string;
+  modelUrl?: string;
+}
 
-export const APIVisualizer = () => {
-  const [activeView, setActiveView] = useState<'visual' | 'code'>('code');
+export const APIVisualizer: React.FC<APIVisualizerProps> = ({ 
+  schemaData,
+  isLoading: externalLoading = false,
+  error: externalError = null,
+  modelName,
+  title = "API Specification",
+  modelUrl
+}: APIVisualizerProps) => {
+  const router = useRouter();
+  const [activeView, setActiveView] = useState<'visual' | 'code'>('visual');
   const [specContent, setSpecContent] = useState<string>('');
+  const [warningCount] = useState(1);
   const [parsedSpec, setParsedSpec] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [internalError, setInternalError] = useState<string | null>(null);
+  const [internalLoading, setInternalLoading] = useState<boolean>(false);
   const [fileName, setFileName] = useState<string>('api-specification.yaml');
 
-  // Load demo OpenAPI spec from file
-  const loadDemoSpec = async () => {
+  // Combine external and internal state
+  const isLoading = externalLoading || internalLoading;
+  const error = externalError || internalError;
+
+  // Process the schema data when it changes
+  useEffect(() => {
+    if (!schemaData) return;
+    
     try {
-      setIsLoading(true);
-      // First, try to load the YAML file from public directory
-      try {
-        const response = await fetch('/data/open-api-demo.yaml');
+      setInternalLoading(true);
+      
+      // If schemaData is a string, we need to parse it
+      if (typeof schemaData === 'string') {
+        setSpecContent(schemaData);
         
-        if (response.ok) {
-          const content = await response.text();
-          setSpecContent(content);
-          
-          // Parse the loaded content
-          const parsed = yaml.load(content);
+        // Try to parse as JSON first
+        try {
+          const parsed = JSON.parse(schemaData);
           setParsedSpec(parsed);
-          setError(null);
-          setIsLoading(false);
-          return; // Exit early if successful
-        } else {
-          console.warn(`Failed to load specification: ${response.status} ${response.statusText}`);
+        } catch (jsonError) {
+          // If JSON parsing fails, try YAML
+          try {
+            const parsed = yaml.load(schemaData);
+            setParsedSpec(parsed);
+          } catch (yamlError) {
+            throw new Error('Failed to parse schema as JSON or YAML');
+          }
         }
-      } catch (fetchErr) {
-        console.error('Error fetching OpenAPI spec file:', fetchErr);
+      } 
+      // If it's already an object, just use it
+      else if (typeof schemaData === 'object') {
+        setParsedSpec(schemaData);
+        // Convert object to YAML for code view
+        try {
+          const yamlContent = yaml.dump(schemaData);
+          setSpecContent(yamlContent);
+        } catch (err) {
+          console.error('Error converting schema to YAML:', err);
+          setSpecContent(JSON.stringify(schemaData, null, 2));
+        }
       }
       
-      // Fallback spec if file can't be loaded
-      const fallbackSpec = `openapi: 3.0.3
-info:
-  title: API Specification
-  version: 1.0.0
-  description: A sample API specification
-paths:
-  /resources:
-    get:
-      summary: Get resources
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Resource'
-    post:
-      summary: Create a resource
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ResourceInput'
-      responses:
-        '201':
-          description: Resource created
-components:
-  schemas:
-    Resource:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-    ResourceInput:
-      type: object
-      properties:
-        name:
-          type: string
-      required:
-        - name
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer`;
-          
-      setSpecContent(fallbackSpec);
-      try {
-        const parsed = yaml.load(fallbackSpec);
-        setParsedSpec(parsed);
-        setError(null);
-      } catch (parseErr) {
-        setError('Error parsing specification');
-      }
+      setInternalError(null);
+    } catch (err) {
+      console.error('Error processing schema data:', err);
+      setInternalError(`Error processing schema: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
-      setIsLoading(false);
+      setInternalLoading(false);
     }
-  };
-
-  useEffect(() => {
-    // Load the demo spec initially
-    loadDemoSpec();
-  }, []);
+  }, [schemaData]);
 
   const handleSpecChange = (newContent: string) => {
     setSpecContent(newContent);
     try {
       const parsed = yaml.load(newContent);
       setParsedSpec(parsed);
-      setError(null);
+      setInternalError(null);
     } catch (err) {
-      setError('Error parsing YAML: ' + (err as Error).message);
+      setInternalError('Error parsing YAML: ' + (err as Error).message);
     }
   };
 
@@ -158,19 +124,13 @@ components:
 
     // Update file name and set loading state
     setFileName(file.name);
-    setIsLoading(true);
-
-    // Show file information in console to help debug
-    console.log(`Processing file: ${file.name}, type: ${file.type}, size: ${file.size} bytes`);
+    setInternalLoading(true);
 
     const reader = new FileReader();
     
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string;
-        
-        // Log first 100 characters to help debug content
-        console.log(`File content preview: ${content.substring(0, 100)}...`);
         
         // Update the spec content in the textarea
         setSpecContent(content);
@@ -186,25 +146,21 @@ components:
         
         // Update the parsed spec for the visual view
         setParsedSpec(parsed);
-        setError(null);
+        setInternalError(null);
         
-        // Switch to 'code' view to show the uploaded content
-        setActiveView('code');
-        
-        // Notify user
-        alert(`Successfully loaded specification from ${file.name}`);
+        // Switch to 'visual' view to show content
+        setActiveView('visual');
       } catch (err) {
         console.error('Error processing file:', err);
-        setError('Error parsing uploaded file: ' + (err as Error).message);
+        setInternalError('Error parsing uploaded file: ' + (err as Error).message);
       } finally {
-        setIsLoading(false);
+        setInternalLoading(false);
       }
     };
     
-    reader.onerror = (event) => {
-      console.error('FileReader error:', event);
-      setError('Error reading file');
-      setIsLoading(false);
+    reader.onerror = () => {
+      setInternalError('Error reading file');
+      setInternalLoading(false);
     };
     
     // Start reading the file as text
@@ -215,11 +171,15 @@ components:
   };
 
   const downloadSpec = () => {
+    // Get a filename based on API title if possible
+    const apiTitle = parsedSpec?.info?.title || 'api-specification';
+    const safeFileName = apiTitle.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '.yaml';
+    
     const blob = new Blob([specContent], { type: 'text/yaml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = fileName;
+    a.download = safeFileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -237,6 +197,63 @@ components:
       });
   };
 
+// Handle Quality Metrics button click
+const handleQualityMetricsClick = () => {
+  try {
+    console.log('Stored API spec for quality analysis in session storage');
+    // Navigate to the quality page without the large query parameter
+    router.push(`/pages/observe/api-quality?schemaUrl=${modelUrl}`);
+  } catch (error) {
+    console.error('Error fushing API spec url:', error);
+  }
+};
+
+
+  // Get the title from props or the parsed spec
+  const displayTitle = modelName || parsedSpec?.info?.title || title;
+
+  // Show loading state if still loading
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-teal-600 mx-auto" />
+          <p className="mt-4 text-gray-600">Loading API specification...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If there's no data at all, show a minimal message
+  if (!parsedSpec && !specContent) {
+    return (
+      <div className="flex-1 p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center gap-2 mb-6">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => router.back()}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h1 className="text-3xl font-bold text-teal-600">No Specification Available</h1>
+          </div>
+          <Card>
+            <CardContent className="py-10 text-center">
+              <p>No API specification data is available to visualize.</p>
+              <Button 
+                className="mt-4"
+                onClick={() => router.push('/pages/discover/api-contracts')}
+              >
+                Return to API Contracts
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 overflow-auto p-2 md:p-8 lg:p-10">
@@ -246,12 +263,12 @@ components:
             <Button 
               variant="outline" 
               size="icon" 
-              onClick={() => window.history.back()}
+              onClick={() => router.back()}
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <h1 className="text-3xl font-bold text-teal-600">
-              {parsedSpec?.info?.title || 'API Specification'}
+              {displayTitle}
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -259,11 +276,23 @@ components:
               variant="ghost" 
               size="sm" 
               className="flex items-center gap-1"
-              onClick={() => window.location.href = '/learn/openapi-cheatsheet'}
+              onClick={() => router.push('/learn/openapi-cheatsheet')}
             >
-              <BookOpenIcon className="h-4 w-4" />
+              <BookOpen className="h-4 w-4" />
               <span>OpenAPI Cheatsheet</span>
             </Button>
+            <label className="cursor-pointer">
+              <input
+                type="file"
+                accept=".yaml,.yml,.json"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
+                <Upload className="w-4 h-4" />
+                <span>Import Spec</span>
+              </div>
+            </label>
             <Button
               onClick={downloadSpec}
               variant="outline"
@@ -279,6 +308,14 @@ components:
             >
               <Copy className="h-4 w-4" />
               <span>Copy</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+            >
+              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              <span>{warningCount} Warning</span>
             </Button>
           </div>
         </div>
@@ -299,18 +336,6 @@ components:
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <label className="cursor-pointer">
-              <input
-                type="file"
-                accept=".yaml,.yml,.json"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
-                <FileText className="w-4 h-4" />
-                <span>Upload Spec</span>
-              </div>
-            </label>
             <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
                 <ShieldCheck className="w-4 h-4" />
                 <span>Validate</span>
@@ -323,9 +348,10 @@ components:
                 <Activity className="w-4 h-4" />
                 <span>Bundle</span>
             </div>
-            <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
-                <Binoculars className="w-4 h-4" />
-                <span>Preview</span>
+            <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer"
+            onClick={handleQualityMetricsClick}>
+                <Activity className="w-4 h-4" />
+                <span>Quality Metrics</span>
             </div>
             <div className="flex p-0.5 bg-gray-100 rounded-md">
               <Button
@@ -357,71 +383,59 @@ components:
           </Alert>
         )}
 
-        {isLoading ? (
-          <div className="text-center py-10">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          </div>
-        ) : activeView === 'code' ? (
+        {activeView === 'visual' ? (
+          <div className="mb-8 flex items-center justify-between">
+              {parsedSpec && (
+                <div className="h-[1000vh] border rounded overflow-hidden">
+                  <RedocStandalone 
+                    spec={parsedSpec}
+                    options={{
+                      nativeScrollbars: true,
+                      hideDownloadButton: true,
+                      theme: { colors: { primary: { main: '#0f766e' } } } // Match teal color
+                    }}
+                  />
+                </div>
+              )}
+           </div>
+        ): (
           <Card>
             <CardContent className="pt-6"> 
-            <div className="w-full h-[70vh] font-mono text-sm border rounded focus-within:ring-2 focus-within:ring-teal-500 overflow-hidden relative">
-              <div className="absolute top-0 left-0 w-full h-full overflow-auto" style={{ backgroundColor: '#1e1e1e' }}>
-                <SyntaxHighlighter
-                  language="yaml"
-                  style={xonokai}
-                  customStyle={{
-                    margin: 0,
-                    padding: '16px',
-                    minHeight: '100%',
-                    width: '100%',
-                    backgroundColor: '#1e1e1e',
-                    overflow: 'visible'
-                  }}
-                  wrapLines={true}
-                  lineProps={{ style: { wordBreak: 'break-all', whiteSpace: 'pre-wrap' } }}
-                >
-                  {specContent}
-                </SyntaxHighlighter>
-                <textarea
-                  value={specContent}
-                  onChange={(e) => handleSpecChange(e.target.value)}
-                  className="absolute top-0 left-0 w-full h-full font-mono text-sm p-4 border-none resize-none focus:outline-none z-10"
-                  spellCheck="false"
-                  style={{
-                    color: 'transparent',
-                    caretColor: 'white',
-                    backgroundColor: 'transparent',
-                    overflow: 'auto'
-                  }}
-                />
+              <div className="w-full h-[70vh] font-mono text-sm border rounded focus-within:ring-2 focus-within:ring-teal-500 overflow-hidden relative">
+                <div className="absolute top-0 left-0 w-full h-full overflow-auto" style={{ backgroundColor: '#1e1e1e' }}>
+                  <SyntaxHighlighter
+                    language="yaml"
+                    style={xonokai}
+                    customStyle={{
+                      margin: 0,
+                      padding: '16px',
+                      minHeight: '100%',
+                      width: '100%',
+                      backgroundColor: '#1e1e1e',
+                      overflow: 'visible'
+                    }}
+                    wrapLines={true}
+                    lineProps={{ style: { wordBreak: 'break-all', whiteSpace: 'pre-wrap' } }}
+                  >
+                    {specContent}
+                  </SyntaxHighlighter>
+                  <textarea
+                    value={specContent}
+                    onChange={(e) => handleSpecChange(e.target.value)}
+                    className="absolute top-0 left-0 w-full h-full font-mono text-sm p-4 border-none resize-none focus:outline-none z-10"
+                    spellCheck="false"
+                    style={{
+                      color: 'transparent',
+                      caretColor: 'white',
+                      backgroundColor: 'transparent',
+                      overflow: 'auto'
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-
             </CardContent>
           </Card>
-        ) : (
-          <Tabs defaultValue="paths" className="w-full">
-            <TabsList className="mb-6">
-              <TabsTrigger value="api">API</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="api">
-                  {parsedSpec && (
-                    <div className="h-[1000vh] border rounded overflow-hidden">
-                    <RedocStandalone 
-                      spec={parsedSpec}
-                      options={{
-                        nativeScrollbars: true,
-                        hideDownloadButton: true,
-                        theme: { colors: { primary: { main: '#0f766e' } } } // Match your teal color
-                      }}
-                    />
-                    </div>
-                  )}
-            </TabsContent>
-
-          </Tabs>
-        )}
+        ) }
       </div>
     </div>
   );

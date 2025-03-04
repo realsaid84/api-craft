@@ -1,8 +1,8 @@
-// app/pages/learn/layout.tsx
+// app/pages/design/layout.tsx
 'use client';
 
-import LearnLayout from '@/components/layouts/LearnLayout';
+import DesignLayout from '@/components/layouts/MainLayout';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <LearnLayout>{children}</LearnLayout>;
+  return <DesignLayout>{children}</DesignLayout>;
 }
