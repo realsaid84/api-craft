@@ -27,7 +27,11 @@ const EmptyState = ({ message }: { message: string }) => (
     <p className="text-muted-foreground mb-4">{message}</p>
     <Button>
       <Plus className="w-4 h-4 mr-2" />
-      Create New Model
+      Create a Greenfield Model
+    </Button>
+    <Button>
+      <Plus className="w-4 h-4 mr-2" />
+      Create a Brownfield Model
     </Button>
   </div>
 );
@@ -156,11 +160,23 @@ export const DataModelsPage = () => {
       <div className="max-w-6xl mx-auto p-8">
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-teal-600">Data Models</h1>
+          <div className="flex gap-4">
+            <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create a Greenfield Model
+              </Button>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Create a Brownfield Model
+              </Button>
+          </div>
+
           <p className="text-xl text-muted-foreground mb-6">
-            Discover and manage reusable data models across your organization.
+            Discover and manage reusable data models across different domains.
           </p>
         </div>
-
+        
+        
         <div className="flex flex-col gap-8">
           <div className="flex justify-between items-right p-8">
             <div className="flex-1 flex gap-4 items-center">
@@ -223,10 +239,7 @@ export const DataModelsPage = () => {
                   <Table className="h-4 w-4" />
                 </Button>
               </div>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                New Model
-              </Button>
+                
             </div>
           </div>
 
@@ -283,11 +296,11 @@ export const DataModelsPage = () => {
                       <td className="py-3 px-4">{model.lastModified}</td>
                       <td className="py-3 px-4">{model.owner}</td>
                       <td className="py-3 px-4">
-                        <Button variant="ghost" size="sm" onClick={(e) => {
+                        <Button variant="ghost" size="sm" className="text-teal-600" onClick={(e) => {
                           e.stopPropagation();
                           handleModelClick(model);
                         }}>
-                          View Schema
+                          View Model
                         </Button>
                       </td>
                     </tr>

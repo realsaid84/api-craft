@@ -344,6 +344,7 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
       return finalSchema;
     } catch (error) {
       console.error('Error generating schema:', error);
+      throw new Error(`Failed to generate schema: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 

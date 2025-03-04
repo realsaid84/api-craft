@@ -499,7 +499,7 @@ export const DataQualityDashboard: React.FC<DataQualityDashboardProps> = ({
             </h1>
           </div>
           <div className="flex items-center gap-2">
-            {!dataModel && (
+         
               <label className="cursor-pointer">
                 <input
                   type="file"
@@ -509,10 +509,10 @@ export const DataQualityDashboard: React.FC<DataQualityDashboardProps> = ({
                 />
                 <div className="px-4 py-2 bg-gray-100 text-black rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer">
                   <Upload className="w-4 h-4" />
-                  <span>Import Model</span>
+                  <span>Import Brownfield Model</span>
                 </div>
               </label>
-            )}
+            
             <Button
               onClick={downloadReport}
               variant="outline"
@@ -546,8 +546,8 @@ export const DataQualityDashboard: React.FC<DataQualityDashboardProps> = ({
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row items-center justify-between">
                     <div className="mb-4 md:mb-0">
-                      <h2 className="text-xl font-semibold text-gray-700 mb-2">
-                        {(dataModel || spec)?.title || (dataModel || spec)?.info?.title || "Untitled Data Model"}
+                      <h2 className="text-xl font-bold text-teal-600">
+                        {`${dataModel?.title} Model` || "Untitled Data Model"}
                       </h2>
                       <div className="flex flex-wrap gap-2">
                         {(dataModel || spec)?.version && (

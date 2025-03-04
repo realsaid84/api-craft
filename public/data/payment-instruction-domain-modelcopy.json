@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PaymentInstruction",
+  "description": "Payment instruction domain model",
+  "type": "object",
+  "required": ["requestedExecutionDate", "paymentIdentifiers", "value", "transferType", "paymentType"],
+  "properties": {
+    "requestedExecutionDate": {
+      "type": "string",
+      "format": "date",
+      "description": "The date when the payment should be executed"
+    },
+    "paymentIdentifiers": {
+      "type": "object",
+      "required": ["endToEndId"],
+      "properties": {
+        "endToEndId": {
+          "type": "string",
+          "description": "End-to-end identifier for the payment"
+        },
+        "otherPaymentReferences": {
+          "type": "object",
+          "properties": {
+            "relatedReferenceId": {
+              "type": "string"
+            },
+            "uetr": {
+              "type": "string",
+              "description": "Unique End-to-End Transaction Reference"
+            }
+          }
+        }
+      }
+    },
+    "value": {
+      "type": "object",
+      "required": ["currency", "amount"],
+      "properties": {
+        "currency": {
+          "type": "string",
+          "description": "The currency code of the payment amount"
+        },
+        "amount": {
+          "type": "string",
+          "description": "The payment amount"
+        }
+      }
+    },
+    "transferType": {
+      "type": "string",
+      "enum": ["CREDIT"],
+      "description": "The type of transfer"
+    },
+    "paymentType": {
+      "type": "string",
+      "enum": ["DEFAULT"],
+      "description": "The type of payment"
+    }
+  }
+}
+    

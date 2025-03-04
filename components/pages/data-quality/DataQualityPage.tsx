@@ -156,10 +156,8 @@ const DataQualityPage = () => {
       </div>
     );
   }
-
-  const modelTitle = dataModel?.title || "Data Model";
-
-  return <DataQualityDashboard dataModel={dataModel} title={`${modelTitle} - Data Hygiene Dashboard`} onBack={handleBack} />;
+  
+  return <DataQualityDashboard dataModel={dataModel} title={`Data Hygiene Dashboard`} onBack={handleBack} />;
 };
 
 export default DataQualityPage;
