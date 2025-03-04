@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Loader2 } from 'lucide-react';
 import * as yaml from 'js-yaml';
-import { APIQualityDashboard } from '@/components/pages/APIQualityDashboard';
+import { APIQualityDashboard } from '@/components/pages/api-quality/APIQualityDashboard';
 
 // Define a fallback specification in case one isn't provided
 const FALLBACK_SPEC = `
