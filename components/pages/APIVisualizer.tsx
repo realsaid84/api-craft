@@ -36,7 +36,7 @@ interface APIVisualizerProps {
   error?: string | null;
   modelName?: string;
   title?: string;
-  modelUrl?: string;
+  schemaUrl?: string;
 }
 
 export const APIVisualizer: React.FC<APIVisualizerProps> = ({ 
@@ -45,7 +45,7 @@ export const APIVisualizer: React.FC<APIVisualizerProps> = ({
   error: externalError = null,
   modelName,
   title = "API Specification",
-  modelUrl
+  schemaUrl
 }: APIVisualizerProps) => {
   const router = useRouter();
   const [activeView, setActiveView] = useState<'visual' | 'code'>('visual');
@@ -202,7 +202,7 @@ const handleQualityMetricsClick = () => {
   try {
     console.log('Stored API spec for quality analysis in session storage');
     // Navigate to the quality page without the large query parameter
-    router.push(`/pages/observe/api-quality?schemaUrl=${modelUrl}`);
+    router.push(`/pages/observe/api-quality?schemaUrl=${schemaUrl}`);
   } catch (error) {
     console.error('Error fushing API spec url:', error);
   }

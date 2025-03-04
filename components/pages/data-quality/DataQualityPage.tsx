@@ -8,64 +8,72 @@ import * as yaml from 'js-yaml';
 import { DataQualityDashboard } from '@/components/pages/data-quality/DataQualityDashboard';
 
 // Define a fallback specification in case one isn't provided
-const FALLBACK_SPEC = `
-openapi: 3.0.3
-info:
-  title: Sample Domain Model
-  version: 1.0.0
-  description: A sample Domain model for testing
-  contact: 
-    name: Data Architecture Enablement Platform
-    url: https://example.com/support
-  license:
-    name: Apache 2.0
-    url: https://www.apache.org/licenses/LICENSE-2.0.html
-servers:
-  - url: https://api.example.com/v1
-    description: Production server
-tags:
-  - name: resources
-    description: Operations related to resources
-paths:
-  /resources:
-    get:
-      summary: Get resources
-      description: Get a list of resources
-      operationId: getResources
-      tags: 
-        -  resources
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Resource'
-components:
-  schemas:
-    Resource:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-`;
+const FALLBACK_MODEL = `
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PaymentInstruction",
+  "description": "Payment instruction domain model",
+  "type": "object",
+  "required": ["requestedExecutionDate", "paymentIdentifiers", "value", "transferType", "paymentType"],
+  "properties": {
+    "requestedExecutionDate": {
+      "type": "string",
+      "format": "date",
+      "description": "The date when the payment should be executed"
+    },
+    "paymentIdentifiers": {
+      "type": "object",
+      "required": ["endToEndId"],
+      "properties": {
+        "endToEndId": {
+          "type": "string",
+          "description": "End-to-end identifier for the payment"
+        },
+        "otherPaymentReferences": {
+          "type": "object",
+          "properties": {
+            "relatedReferenceId": {
+              "type": "string"
+            },
+            "uetr": {
+              "type": "string",
+              "description": "Unique End-to-End Transaction Reference"
+            }
+          }
+        }
+      }
+    },
+    "value": {
+      "type": "object",
+      "required": ["currency", "amount"],
+      "properties": {
+        "currency": {
+          "type": "string",
+          "description": "The currency code of the payment amount"
+        },
+        "amount": {
+          "type": "string",
+          "description": "The payment amount"
+        }
+      }
+    },
+    "transferType": {
+      "type": "string",
+      "enum": ["CREDIT"],
+      "description": "The type of transfer"
+    },
+    "paymentType": {
+      "type": "string",
+      "enum": ["DEFAULT"],
+      "description": "The type of payment"
+    }
+  }
+}`;
 
 const DataQualityPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [apiSpec, setApiSpec] = useState<any>(null);
+  const [dataModel, setDataModel] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,29 +84,8 @@ const DataQualityPage = () => {
         
         // Check if a spec was passed via query params
         const schemaUrl = searchParams.get('schemaUrl');
-        const source = searchParams.get('source');
-
-        // Case 1: Direct spec through session storage
-        if (source === 'editor') {
-          try {
-            // Retrieve the spec from sessionStorage
-            const storedSpec = sessionStorage.getItem('api-spec-for-quality');
-            if (storedSpec) {
-              const parsedStoredSpec = JSON.parse(storedSpec);
-              setApiSpec(parsedStoredSpec);
-              
-              // Optionally clear storage after use
-              sessionStorage.removeItem('api-spec-for-quality');
-              setLoading(false);
-              return;
-            }
-          } catch (err) {
-            console.error('Error retrieving stored spec:', err);
-            setError('Failed to load API specification from storage');
-          }
-        }
         
-        // Case 2: Schema URL provided to fetch
+        // Case: Schema URL provided to fetch
         if (schemaUrl) {
           try {
             const response = await fetch(schemaUrl);
@@ -109,12 +96,12 @@ const DataQualityPage = () => {
             const contentType = response.headers.get('content-type');
             if (contentType?.includes('application/json')) {
               const jsonData = await response.json();
-              setApiSpec(jsonData);
+              setDataModel(jsonData);
             } else {
               // Assume YAML
               const yamlText = await response.text();
               const yamlData = yaml.load(yamlText);
-              setApiSpec(yamlData);
+              setDataModel(yamlData);
             }
             
             setLoading(false);
@@ -127,8 +114,8 @@ const DataQualityPage = () => {
         
         // Case 3: No valid spec found, use fallback
         try {
-          const fallbackData = yaml.load(FALLBACK_SPEC);
-          setApiSpec(fallbackData);
+          const fallbackData = yaml.load(FALLBACK_MODEL);
+          setDataModel(fallbackData);
         } catch (err) {
           setError(`Failed to load fallback spec: ${err instanceof Error ? err.message : 'Unknown error'}`);
         }
@@ -170,9 +157,9 @@ const DataQualityPage = () => {
     );
   }
 
-  const apiTitle = apiSpec?.info?.title || "API Quality Dashboard";
+  const modelTitle = dataModel?.title || "Data Model";
 
-  return <DataQualityDashboard apiSpec={apiSpec} title={`${apiTitle} - Quality Score Card`} onBack={handleBack} />;
+  return <DataQualityDashboard dataModel={dataModel} title={`${modelTitle} - Data Hygiene Dashboard`} onBack={handleBack} />;
 };
 
 export default DataQualityPage;

@@ -4,6 +4,7 @@
   "description": "Payment instruction domain model",
   "type": "object",
   "required": ["requestedExecutionDate", "paymentIdentifiers", "value", "transferType", "paymentType"],
+  "xModelType": "BIM",
   "properties": {
     "requestedExecutionDate": {
       "type": "string",

@@ -324,6 +324,7 @@ export default function Page() {
       schema={schema} 
       modelName={modelName} 
       title={`${modelName} Schema`} 
+      schemaUrl={schemaUrl || ''}
       markdownModel={markdownModel}
     />
   );

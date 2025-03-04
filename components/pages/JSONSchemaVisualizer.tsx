@@ -43,6 +43,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import mermaid from 'mermaid';
 
+
 // Initialize mermaid
 mermaid.initialize({
   startOnLoad: true,
@@ -57,6 +58,7 @@ interface JSONSchema {
   title?: string;
   description?: string;
   type?: string;
+  xModelType?: string;
   properties?: Record<string, JSONSchema>;
   required?: string[];
   definitions?: Record<string, JSONSchema>;
@@ -72,6 +74,7 @@ interface SchemaVisualizerProps {
   schema: JSONSchema;
   title?: string;
   modelName?: string;
+  schemaUrl: string;
   markdownModel?: string;
   onBack?: () => void;
 }
@@ -136,11 +139,15 @@ const MarkdownRenderer = ({ markdown }: { markdown: string }) => {
 };
 
 
+
+
+
 export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({ 
   schema: initialSchema, 
   title = "Schema Visualizer", 
   modelName,
   markdownModel: initialMarkdownModel,
+  schemaUrl: initialSchemaUrl,
   onBack 
 }: SchemaVisualizerProps) => {
   const router = useRouter();
@@ -154,6 +161,7 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
   const [selectedExample, setSelectedExample] = useState<string>('default');
   const [schema, setSchema] = useState(initialSchema);
   const [markdownModel, setMarkdownModel] = useState<string | undefined>(initialMarkdownModel);
+  const [schemaUrl, setSchemaUrl] = useState<string | undefined>(initialSchemaUrl);
 
   const modelTitle = modelName || schema.title || title;
 
@@ -188,6 +196,17 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
     }
     
     return examples;
+  };
+
+  // Handle Quality Metrics button click
+  const handleQualityMetricsClick = () => {
+    try {
+      console.log('Stored API spec for quality analysis in session storage');
+      // Navigate to the quality page without the large query parameter
+      router.push(`/pages/observe/data-quality?schemaUrl=${schemaUrl}`);
+    } catch (error) {
+      console.error('Error fushing API spec url:', error);
+    }
   };
 
   const getSchemaJson = (): string => {
@@ -325,7 +344,6 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
       return finalSchema;
     } catch (error) {
       console.error('Error generating schema:', error);
-      throw new Error(`Failed to generate schema: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -467,16 +485,18 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
               <Button variant="outline" size="sm" className="gap-2 text-gray-700">
                 <Workflow className="h-4 w-4" />
                 <span>Forward Engineer</span>
-              </Button>
-              <Button variant="outline" size="sm" className="gap-2 text-gray-700">
-                <GitCompare className="h-4 w-4" />
-                <span>Map and Compare</span>
-              </Button>
-              <Button variant="outline" size="sm" className="gap-2 text-gray-700">
-                <GitMerge className="h-4 w-4" />
-                <span>Merge and Validate</span>
-              </Button>
-              <Button variant="outline" size="sm" className="gap-2 text-gray-700">
+              </Button>                  
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2 text-teal-600"
+                      onClick={() => setShowJsonDialog(true)}
+                    >
+                      <FileJson className="h-4 w-4" />
+                      <span>Reverse Engineer from JSON</span>
+                    </Button>
+              <Button variant="outline" size="sm" className="gap-2 text-gray-700"
+              onClick={handleQualityMetricsClick}>
                 <Activity className="h-4 w-4" />
                 <span>Quality Metrics</span>
               </Button>
@@ -506,9 +526,13 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
                       className="gap-2 text-teal-600"
                       onClick={() => setShowJsonDialog(true)}
                     >
-                      <FileJson className="h-4 w-4" />
-                      <span>Reverse Engineer from JSON</span>
+                      <GitCompare className="h-4 w-4" />
+                      <span>Map and Compare</span>
                     </Button>
+                    <Button variant="outline" size="sm" className="gap-2 text-gray-700">
+                      <GitMerge className="h-4 w-4" />
+                      <span>Merge and Validate</span>
+                  </Button>
                   </div>
                 </div>
               </div>
@@ -680,9 +704,9 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
     <Dialog open={showJsonDialog} onOpenChange={setShowJsonDialog}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Generate Schema from JSON</DialogTitle>
+          <DialogTitle>Generate a Model from JSON</DialogTitle>
           <DialogDescription>
-            Paste your JSON example, and we'll generate a JSON Schema from it.
+            Paste your JSON example, and we'll generate a model from it.
           </DialogDescription>
         </DialogHeader>
         
@@ -718,7 +742,7 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button onClick={handleGenerateSchema}>Generate Schema</Button>
+          <Button onClick={handleGenerateSchema}>Generate Model</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

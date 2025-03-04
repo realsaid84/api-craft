@@ -76,29 +76,9 @@ const ApiQualityPage = () => {
         
         // Check if a spec was passed via query params
         const schemaUrl = searchParams.get('schemaUrl');
-        const source = searchParams.get('source');
 
-        // Case 1: Direct spec through session storage
-        if (source === 'editor') {
-          try {
-            // Retrieve the spec from sessionStorage
-            const storedSpec = sessionStorage.getItem('api-spec-for-quality');
-            if (storedSpec) {
-              const parsedStoredSpec = JSON.parse(storedSpec);
-              setApiSpec(parsedStoredSpec);
-              
-              // Optionally clear storage after use
-              sessionStorage.removeItem('api-spec-for-quality');
-              setLoading(false);
-              return;
-            }
-          } catch (err) {
-            console.error('Error retrieving stored spec:', err);
-            setError('Failed to load API specification from storage');
-          }
-        }
         
-        // Case 2: Schema URL provided to fetch
+        // Case: Schema URL provided to fetch
         if (schemaUrl) {
           try {
             const response = await fetch(schemaUrl);
@@ -125,7 +105,7 @@ const ApiQualityPage = () => {
           }
         }
         
-        // Case 3: No valid spec found, use fallback
+        // Case 2: No valid spec found, use fallback
         try {
           const fallbackData = yaml.load(FALLBACK_SPEC);
           setApiSpec(fallbackData);
