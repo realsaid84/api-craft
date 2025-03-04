@@ -160,23 +160,11 @@ export const DataModelsPage = () => {
       <div className="max-w-6xl mx-auto p-8">
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-teal-600">Data Models</h1>
-          <div className="flex gap-4">
-            <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create a Greenfield Model
-              </Button>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Create a Brownfield Model
-              </Button>
-          </div>
-
           <p className="text-xl text-muted-foreground mb-6">
             Discover and manage reusable data models across different domains.
           </p>
         </div>
-        
-        
+
         <div className="flex flex-col gap-8">
           <div className="flex justify-between items-right p-8">
             <div className="flex-1 flex gap-4 items-center">
@@ -239,7 +227,10 @@ export const DataModelsPage = () => {
                   <Table className="h-4 w-4" />
                 </Button>
               </div>
-                
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                New Greenfield Model
+              </Button>
             </div>
           </div>
 
