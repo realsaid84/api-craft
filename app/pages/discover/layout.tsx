@@ -1,4 +1,4 @@
-// app/pages/discover/layout.tsx
+// app/pages/perform/lifecycle-actions/layout.tsx
 'use client';
 
 import DiscoveryLayout from '@/components/layouts/MainLayout';

@@ -49,7 +49,7 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({ children }) => 
         { name: 'Reusable Data Models', path: '/pages/discover/data-models' },
         { name: 'API Contracts', path: '/pages/discover/api-contracts' },
         { name: 'API Common Components', path: '/pages/discover/components' },
-        { name: 'Interactive Data Dictionaries', path: '/pages/discover/dictionaries' }
+        { name: 'Interactive Data Dictionaries', path: '/pages/discover/data-models' }
       ]
     },
     {
@@ -57,8 +57,7 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({ children }) => 
       icon: sectionIcons['OBSERVE'],
       items: [
         { name: 'Data Quality', path: '/pages/observe/data-quality' },
-        { name: 'API Quality', path: '/pages/observe/api-quality' },
-        { name: 'Governance Metrics', path: '/pages/observe/metrics' }
+        { name: 'API Quality', path: '/pages/observe/api-quality' }
       ]
     },
     {
@@ -74,9 +73,9 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({ children }) => 
       title: 'PERFORM',
       icon: sectionIcons['PERFORM'],
       items: [
-        { name: 'Routine Actions', path: '/pages/perform/routine-actions' },
-        { name: 'Preview', path: '/pages/design/api-editor' },
-        { name: 'Code Gen', path: '/pages/perform/codegen' }
+        { name: 'Lifecycle Actions', path: '/pages/perform/lifecycle-actions' },
+        { name: 'Lifecycle Dashboard', path: '/pages/perform/lifecycle-dashboard' },
+        { name: 'OAS Preview', path: '/pages/design/api-editor' }
       ]
     },
     {

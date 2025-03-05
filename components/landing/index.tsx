@@ -50,27 +50,27 @@ const MainContent: React.FC = () => {
     },
     {
       icon: ShieldCheck,
-      title: "Data and API Quality Control →",
-      description: "Improve data and API quality through metadata tests, assertions, governance validations, and conformance checks.",
+      title: "Data Hygiene →",
+      description: "Improve data quality through metadata tests, assertions, governance validations, and conformance checks.",
       link: "/pages/observe/data-quality"
     },
     {
-      icon: Code,
-      title: "Design APIs and Data Models →",
-      description: "Easily author APIs leveraging data models and standard templates to kicks-sart your API design using an intuitive.",
-      link: "/pages/design/api-editor"
+      icon: Activity,
+      title: "API Quality Control →",
+      description: "Improve API quality through validations, tests, assertions, governance and conformance checks.",
+      link: "/pages/observe/api--quality"
     },
     {
-      icon: Activity,
-      title: "Manage Tests →",
-      description: "Document BDD features, Generate, Execute and Explore various API Tests.",
-      link: "/test/generate"
+      icon: Code,
+      title: "Design APIs →",
+      description: "Easily author APIs leveraging data models and standard templates to kicks-sart your API design using an intuitive.",
+      link: "/pages/design/api-editor"
     },
     {
       icon: Heart,
       title: "Perform API Route-to-Live Lifecycle Actions →",
       description: "Perform routine API delivery lifecycle actions such as Code Gen, Bundling, Proxying and mocking.",
-      link: "/pages/perform/routine-actions"
+      link: "/pages/perform/lifecycle-actions"
     }
   ];
 

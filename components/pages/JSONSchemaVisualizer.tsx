@@ -360,7 +360,7 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
       setShowJsonDialog(false);
       setViewTab('visual');  // Switch to visual view to display the new schema
     } catch (error) {
-      setJsonError(error instanceof Error ? error.message : String(error));
+      //setJsonError(error instanceof Error ? error.message : String(error));
     }
   };
 
@@ -568,9 +568,9 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
                 
                 {viewTab === 'preview' && (
                   <div className="p-4">
-                    {schema.markdownModel ? (
+                    {markdownModel ? (
                       <div className="markdown-preview prose max-w-none">
-                        <MarkdownRenderer markdown={schema.markdownModel} />
+                        <MarkdownRenderer markdown={markdownModel} />
                       </div>
                     ) : (
                       <div className="text-center py-10">
