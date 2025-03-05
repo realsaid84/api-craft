@@ -75,7 +75,7 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({ children }) => 
       items: [
         { name: 'Lifecycle Actions', path: '/pages/perform/lifecycle-actions' },
         { name: 'Lifecycle Dashboard', path: '/pages/perform/lifecycle-dashboard' },
-        { name: 'OAS Preview', path: '/pages/design/api-editor' }
+        { name: 'OAS Preview', path: '/pages/design/api-visualizer' }
       ]
     },
     {
