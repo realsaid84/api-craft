@@ -4,20 +4,17 @@ import {
   ChevronRight, 
   ArrowLeft, 
   Code, 
-  FormInput, 
-  Eye, 
   AlertTriangle, 
   Plus, 
   Workflow, 
   GitCompare, 
-  GitMerge, 
-  Check, 
+  GitMerge,  
   Info, 
   AlertCircle, 
   FileJson,
   Copy,
   Activity,
-  X
+  Eye
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,7 +33,7 @@ import {
   DialogClose
 } from '@/components/ui/dialog';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { xonokai } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { xonokai }  from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -109,7 +106,7 @@ const MarkdownRenderer = ({ markdown }: { markdown: string }) => {
       rehypePlugins={[rehypeKatex]}
       components={{
         // Handle code blocks specifically for mermaid
-        code({ node, className, children, ...props }) {
+        code({ className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || '');
           const language = match ? match[1] : '';
           
@@ -120,6 +117,7 @@ const MarkdownRenderer = ({ markdown }: { markdown: string }) => {
           return (
             <SyntaxHighlighter
               language={language}
+              // @ts-ignore - Force TypeScript to ignore this specific type error
               style={xonokai}
               customStyle={{
                 margin: '1rem 0',
@@ -147,8 +145,7 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
   title = "Schema Visualizer", 
   modelName,
   markdownModel: initialMarkdownModel,
-  schemaUrl: initialSchemaUrl,
-  onBack 
+  schemaUrl: initialSchemaUrl, 
 }: SchemaVisualizerProps) => {
   const router = useRouter();
   const [viewTab, setViewTab] = useState<'visual' | 'code' | 'preview'>('visual');
@@ -227,7 +224,7 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
         
         const type = Array.isArray(value) ? 'array' : typeof value;
         
-        let schema: JSONSchema = { type };
+        const schema: JSONSchema = { type };
         if (title) schema.title = title;
         
         switch (type) {
@@ -331,7 +328,7 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
       };
       
       // Generate the schema
-      let generatedSchema = generateSchema(obj);
+      const generatedSchema = generateSchema(obj);
       
       // Add JSON Schema metadata
       const finalSchema: JSONSchema = {
@@ -360,7 +357,7 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
       setShowJsonDialog(false);
       setViewTab('visual');  // Switch to visual view to display the new schema
     } catch (error) {
-      //setJsonError(error instanceof Error ? error.message : String(error));
+      setJsonError(error instanceof Error ? error.message : String(error));
     }
   };
 
@@ -579,7 +576,7 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
                         </div>
                         <h3 className="text-lg font-semibold mb-2">No Preview Available</h3>
                         <p className="text-muted-foreground mb-4">
-                          This schema doesn't have any model diagram to preview.
+                          This schema does not have any model diagram to preview.
                         </p>
                       </div>
                     )}
@@ -707,7 +704,7 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
         <DialogHeader>
           <DialogTitle>Generate a Model from JSON</DialogTitle>
           <DialogDescription>
-            Paste your JSON example, and we'll generate a model from it.
+            Paste your JSON example, and we will generate a model from it.
           </DialogDescription>
         </DialogHeader>
         

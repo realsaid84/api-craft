@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { DataModel, DataModelFilter } from '@/components/types/data-models';
 import { sampleDataModels } from '@/public/data/data-models';
 import { 
@@ -47,13 +46,6 @@ const EmptyState = ({ message }: { message: string }) => (
   </div>
 );
 
-// Error Alert Component
-const ErrorAlert = ({ message }: { message: string }) => (
-  <Alert variant="destructive">
-    <AlertCircle className="h-4 w-4" />
-    <AlertDescription>{message}</AlertDescription>
-  </Alert>
-);
 
 const demoDataModel = `specification com.app.api-framework.DemoDataModel
 
@@ -360,7 +352,7 @@ export const DataModelsPage = () => {
         <DialogHeader>
           <DialogTitle>Create a Greefield Model using Marple</DialogTitle>
           <DialogDescription>
-            Declare your marple model definitions, and we'll generate a model from it.
+            Declare your marple model definitions, and we will generate a model from it.
           </DialogDescription>
         </DialogHeader>
         

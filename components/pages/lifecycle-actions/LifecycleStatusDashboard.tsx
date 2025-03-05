@@ -13,15 +13,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Check, 
-  X, 
   AlertTriangle, 
   Info, 
   Terminal, 
   FileText, 
-  Database, 
-  Shield, 
-  Server,
   BarChart3,
   RefreshCw,
   Clock,
@@ -189,22 +184,6 @@ const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         return <Info className="h-5 w-5 text-blue-500" />;
       case 'pending':
         return <Clock className="h-5 w-5 text-gray-400" />;
-    }
-  };
-  
-  // Get icon for category
-  const getCategoryIcon = (category: string) => {
-    switch (category.toLowerCase()) {
-      case 'oas':
-        return <FileText className="h-5 w-5 text-blue-500" />;
-      case 'mock':
-        return <Database className="h-5 w-5 text-purple-500" />;
-      case 'gateway':
-        return <Server className="h-5 w-5 text-green-500" />;
-      case 'entitlements':
-        return <Shield className="h-5 w-5 text-amber-500" />;
-      default:
-        return <Terminal className="h-5 w-5 text-gray-500" />;
     }
   };
   

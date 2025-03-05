@@ -3,8 +3,6 @@ import {
   ChevronDown, 
   ChevronRight,
   ChevronLeft,
-  X, 
-  Menu, 
   BookOpen, 
   Search, 
   Shield, 
@@ -75,16 +73,16 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({ children }) => 
       items: [
         { name: 'Lifecycle Actions', path: '/pages/perform/lifecycle-actions' },
         { name: 'Lifecycle Dashboard', path: '/pages/perform/lifecycle-dashboard' },
-        { name: 'OAS Preview', path: '/pages/design/api-editor' }
+        { name: 'OAS Preview', path: '/pages/design/api-visualizer' }
       ]
     },
     {
       title: 'TEST',
       icon: sectionIcons['TEST'],
       items: [
-        { name: 'Generate Tests', path: '/test/generate' },
-        { name: 'Execute Tests', path: '/test/execute' },
-        { name: 'Explore Tests', path: '/test/explore' }
+        { name: 'Generate Tests', path: '/pages/test/generate' },
+        { name: 'Execute Tests', path: '/pages/test/execute' },
+        { name: 'Explore Tests', path: '/pages/test/explore' }
       ]
     }
   ];

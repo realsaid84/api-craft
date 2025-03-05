@@ -2,7 +2,6 @@ import React from 'react';
 import { BookOpen, FileSearch, Settings, ShieldCheck, Code, Activity, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CollapsibleSidebar from '@/components/widgets/CollapsibleSidebar'; 
-import { useState, useEffect } from 'react';
 
 // FeatureCard Component
 interface FeatureCardProps {
@@ -90,10 +89,10 @@ const MainContent: React.FC = () => {
               <a href="/pages/discover/data-models">Get Started</a>
             </Button>
             <Button variant="outline" asChild>
-              <a href="/learn/openapi-cheatsheet">API Education</a>
+              <a href="/pages/learn/openapi-cheatsheet">API Education</a>
             </Button>
             <Button variant="outline" asChild>
-              <a href="/discover/dictionaries">Reusable Data Models</a>
+              <a href="/pages/discover/data-models">Reusable Data Models</a>
             </Button> 
             <Button variant="outline" asChild>
               <a href="/pages/discover/api-contracts">APIs</a>
@@ -102,7 +101,7 @@ const MainContent: React.FC = () => {
               <a href="/pages/discover/components">API Common Components and Templates</a>
             </Button>
             <Button variant="outline" asChild>
-              <a href="/pages/perform/routine-actions">Lifecycle actions</a>
+              <a href="/pages/perform/lifecycle-actions">API Lifecycle actions</a>
             </Button>
           </div>
         </div>

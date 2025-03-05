@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Bot, X, Send, Minimize2, ChevronUp, RotateCcw, 
   Copy, Sparkles, ChevronDown, Globe

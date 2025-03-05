@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import CollapsibleSidebar from '@/components/widgets/CollapsibleSidebar'; 
 import { AIAssistant } from '@/components/widgets/dapa-intelligence';
 
@@ -9,7 +9,7 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+
 
   return (
     <>
