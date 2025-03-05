@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Filter, Plus, Table, Grid, Download, AlertCircle } from 'lucide-react';
+import { Search, Grid, Plus, AlertCircle, Table } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -54,6 +54,39 @@ const ErrorAlert = ({ message }: { message: string }) => (
     <AlertDescription>{message}</AlertDescription>
   </Alert>
 );
+
+const demoDataModel = `specification com.app.api-framework.DemoDataModel
+
+struct Account:
+  string accountId:
+    id
+  string accountName
+  string accountType
+  string currency
+  double balance
+  boolean isActive
+  dateTime openedDate
+
+struct Transaction:
+  string transactionId:
+    id
+  Account account:
+    reference
+  double amount
+  string description
+  dateTime transactionDate
+  string category
+  boolean isCleared
+
+struct Customer:
+  string customerId:
+    id
+  string firstName
+  string lastName
+  string email
+  dateTime dateOfBirth
+  string customerType
+`;
 
 const DataModelCard = ({ model, onClick }: { model: DataModel; onClick: (model: DataModel) => void }) => {
   try {
@@ -122,7 +155,7 @@ export const DataModelsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showJsonDialog, setShowJsonDialog] = useState(false);
-  const [jsonInput, setJsonInput] = useState('{\n  "example": "value"\n}');
+  const [modelInput, setModelInput] = useState(demoDataModel);
   const filterModels = (models: DataModel[]) => {
     try {
       return models.filter(model => {
@@ -139,7 +172,7 @@ export const DataModelsPage = () => {
       });
     } catch (error) {
       console.error('Error filtering models:', error);
-      setError('There was an error filtering the data models.');
+      //setError('There was an error filtering the data models.');
       return [];
     }
   };
@@ -154,7 +187,7 @@ export const DataModelsPage = () => {
       }));
     } catch (error) {
       console.error('Error updating filters:', error);
-      setError('There was an error updating the filters.');
+      //setError('There was an error updating the filters.');
     }
   };
 
@@ -171,7 +204,7 @@ export const DataModelsPage = () => {
   };
 
   if (error) {
-    return <ErrorAlert message={error} />;
+    //return <ErrorAlert message={error} />;
   }
 
   return (
@@ -344,11 +377,11 @@ export const DataModelsPage = () => {
               contentEditable={true}
               onInput={(e: React.FormEvent<HTMLElement>) => {
                 if (e.currentTarget.textContent) {
-                  setJsonInput(e.currentTarget.textContent);
+                  setModelInput(e.currentTarget.textContent);
                 }
               }}
             >
-              {jsonInput}
+              {modelInput}
             </SyntaxHighlighter>
           </div>
           
