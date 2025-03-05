@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { DataModel, DataModelFilter } from '@/components/types/data-models';
 import { sampleDataModels } from '@/public/data/data-models';
 import { 
