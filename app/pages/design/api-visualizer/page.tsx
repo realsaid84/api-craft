@@ -159,7 +159,7 @@ export default function APIVisualizerPage() {
       error={error}
       modelName={modelName}
       title="API Specification"
-      modelUrl={schemaUrl}
+      schemaUrl={schemaUrl}
     />
   );
 }
