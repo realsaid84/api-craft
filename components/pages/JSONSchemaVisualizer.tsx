@@ -33,7 +33,7 @@ import {
   DialogClose
 } from '@/components/ui/dialog';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { xonokai } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { xonokai }  from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -117,6 +117,7 @@ const MarkdownRenderer = ({ markdown }: { markdown: string }) => {
           return (
             <SyntaxHighlighter
               language={language}
+              // @ts-ignore - Force TypeScript to ignore this specific type error
               style={xonokai}
               customStyle={{
                 margin: '1rem 0',
