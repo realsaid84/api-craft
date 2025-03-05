@@ -2,7 +2,6 @@ import React from 'react';
 import { BookOpen, FileSearch, Settings, ShieldCheck, Code, Activity, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CollapsibleSidebar from '@/components/widgets/CollapsibleSidebar'; 
-import { useState, useEffect } from 'react';
 
 // FeatureCard Component
 interface FeatureCardProps {

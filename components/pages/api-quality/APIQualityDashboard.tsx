@@ -5,12 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Progress } from "@/components/ui/progress";
-import { Input } from '@/components/ui/input';
 import { 
   AlertCircle, 
   Upload, 
-  ChevronDown, 
   AlertTriangle, 
   Info, 
   Check, 
@@ -22,8 +19,7 @@ import {
   FileJson,
   ArrowLeft,
   Loader2,
-  Download,
-  Car
+  Download
 } from 'lucide-react';
 import * as yaml from 'js-yaml';
 
@@ -68,14 +64,6 @@ const getStatusColor = (score: number): string => {
   return 'bg-red-500 text-white';
 };
 
-// Helper function to get progress bar color
-const getProgressColor = (score: number): string => {
-  if (score >= 90) return 'bg-green-500';
-  if (score >= 80) return 'bg-blue-500';
-  if (score >= 70) return 'bg-yellow-500';
-  if (score >= 60) return 'bg-orange-500';
-  return 'bg-red-500';
-};
 
 // List of rule categories to check
 const ruleCategories = [
@@ -591,7 +579,7 @@ export const APIQualityDashboard: React.FC<APIQualityDashboardProps> = ({
                       <div className="p-4 border rounded-md bg-gray-50">
                         {metrics.overall >= 90 ? (
                           <p className="text-gray-700">
-                            Wow, just wow! This is absolutely perfect, you've done an amazing job. You're a rockstar! Can I hire you?
+                            Wow, just wow! This is absolutely perfect, you've done an amazing job. You are a rockstar!
                           </p>
                         ) : metrics.overall >= 80 ? (
                           <p className="text-gray-700">
@@ -600,7 +588,7 @@ export const APIQualityDashboard: React.FC<APIQualityDashboardProps> = ({
                           </p>
                         ) : metrics.overall >= 70 ? (
                           <p className="text-gray-700">
-                            Your API specification is acceptable, but there's room for improvement. You should address the {" "}
+                            Your API specification is acceptable, but there is room for improvement. You should address the {" "}
                             {violations.errors} errors and consider fixing some of the {violations.warnings} warnings to improve quality.
                           </p>
                         ) : metrics.overall >= 60 ? (
@@ -610,8 +598,8 @@ export const APIQualityDashboard: React.FC<APIQualityDashboardProps> = ({
                           </p>
                         ) : (
                           <p className="text-gray-700">
-                            On the border of terrible! This specification is in extremely poor shape. It's a mess,
-                            and it's not going to be useful to anyone. You've got a lot of work to do. I've detected {" "}
+                            On the border of terrible! This specification is in extremely poor shape. It is a mess,
+                            and it is not going to be useful to anyone. You have a lot of work to do. I have detected {" "}
                             {violations.errors} errors, which is entirely too high. You should fix these immediately.
                             There are {violations.warnings} warnings that are causing significant damage to the quality.
                           </p>

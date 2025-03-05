@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { Message, ContextType, AnalyticsData, responsesByContext, followUpResponses } from './types';
 import { detectContextFromUrl, countTokens, isScoreRelatedQuestion, isFixRelatedQuestion } from './utils';
 

@@ -3,8 +3,6 @@ import {
   ChevronDown, 
   ChevronRight,
   ChevronLeft,
-  X, 
-  Menu, 
   BookOpen, 
   Search, 
   Shield, 

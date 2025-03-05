@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
-  Check, ChevronDown, Info, AlertCircle, Command, 
+  Check, 
   Terminal, Play, FileText, FileCode, Database, Shield,
-  Server, BarChart, GitMerge, ArrowRight, Book, RefreshCcw
+  Server, Book, RefreshCcw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,7 +15,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import CommandSelector from './CommandSelector';
 import CommandOptions from './CommandOptions';
 import ExecutionResults from './ExecutionResults';
@@ -227,7 +226,6 @@ const LifecycleActionsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('execution');
-  const [projectPath, setProjectPath] = useState<string>('');
   // Get command definition based on selected command
   const getCommandDefinition = (): CommandDefinition | null => {
     const [commandType, subCommand] = selectedCommand.split(':');

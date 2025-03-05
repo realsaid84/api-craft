@@ -6,11 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Input } from '@/components/ui/input';
 import { 
   AlertCircle, 
   Upload, 
-  ChevronDown, 
   AlertTriangle, 
   Info, 
   Check, 
@@ -761,7 +759,7 @@ export const DataQualityDashboard: React.FC<DataQualityDashboardProps> = ({
                             <p className="text-gray-700">
                               This data model meets high quality standards. It demonstrates excellent structural integrity, 
                               clear semantics, proper governance, and strong security considerations. 
-                              It's ready for enterprise adoption and integration.
+                              It is ready for enterprise adoption and integration.
                             </p>
                           ) : metrics.overall >= 80 ? (
                             <p className="text-gray-700">

@@ -47,13 +47,6 @@ const EmptyState = ({ message }: { message: string }) => (
   </div>
 );
 
-// Error Alert Component
-const ErrorAlert = ({ message }: { message: string }) => (
-  <Alert variant="destructive">
-    <AlertCircle className="h-4 w-4" />
-    <AlertDescription>{message}</AlertDescription>
-  </Alert>
-);
 
 const demoDataModel = `specification com.app.api-framework.DemoDataModel
 
@@ -360,7 +353,7 @@ export const DataModelsPage = () => {
         <DialogHeader>
           <DialogTitle>Create a Greefield Model using Marple</DialogTitle>
           <DialogDescription>
-            Declare your marple model definitions, and we'll generate a model from it.
+            Declare your marple model definitions, and we will generate a model from it.
           </DialogDescription>
         </DialogHeader>
         

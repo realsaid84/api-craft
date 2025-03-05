@@ -35,7 +35,7 @@ const ComingSoonPage = () => {
           {/* Warm Message */}
           <div className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto space-y-4">
             <p>
-              We're putting the finishing touches on this exciting new feature of DAPA.
+              We are putting the finishing touches on this exciting new feature of DAPA.
             </p>
             <p>
               Our team is working diligently to create a seamless and powerful experience that will 

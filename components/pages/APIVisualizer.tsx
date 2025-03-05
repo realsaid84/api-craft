@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Card,
   CardContent,
@@ -18,11 +17,9 @@ import {
   ShieldCheck,
   BadgePercent,
   Activity,
-  Binoculars,
   Loader2,
   AlertTriangle,
   Upload,
-  CheckCheck
 } from 'lucide-react';
 import * as yaml from 'js-yaml';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -54,7 +51,6 @@ export const APIVisualizer: React.FC<APIVisualizerProps> = ({
   const [parsedSpec, setParsedSpec] = useState<any>(null);
   const [internalError, setInternalError] = useState<string | null>(null);
   const [internalLoading, setInternalLoading] = useState<boolean>(false);
-  const [fileName, setFileName] = useState<string>('api-specification.yaml');
 
   // Combine external and internal state
   const isLoading = externalLoading || internalLoading;
@@ -81,7 +77,7 @@ export const APIVisualizer: React.FC<APIVisualizerProps> = ({
             const parsed = yaml.load(schemaData);
             setParsedSpec(parsed);
           } catch (yamlError) {
-            throw new Error('Failed to parse schema as JSON or YAML');
+            throw new Error('Failed to parse schema as JSON or YAML'+ (yamlError as Error).message +"-"+ (jsonError as Error).message);
           }
         }
       } 
@@ -122,8 +118,7 @@ export const APIVisualizer: React.FC<APIVisualizerProps> = ({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Update file name and set loading state
-    setFileName(file.name);
+    // set loading state
     setInternalLoading(true);
 
     const reader = new FileReader();

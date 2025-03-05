@@ -9,23 +9,18 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   FileText,
   Code,
   Eye,
-  Save,
   Download,
   AlertCircle,
   Copy,
   AlertTriangle,
   ArrowLeft,
-  BookOpen,
   BookOpen as BookOpenIcon,
   ShieldCheck,
-  BadgePercent,
-  Activity,
   Binoculars
 } from 'lucide-react';
 import * as yaml from 'js-yaml';
@@ -132,8 +127,8 @@ components:
         const parsed = yaml.load(fallbackSpec);
         setParsedSpec(parsed);
         setError(null);
-      } catch (parseErr) {
-        setError('Error parsing specification');
+      } catch (err) {
+        setError('Error parsing specification'+ (err as Error).message);
       }
     } finally {
       setIsLoading(false);

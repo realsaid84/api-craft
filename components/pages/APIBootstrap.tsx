@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { Info, Home, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -14,10 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  CardContent
 } from '@/components/ui/card';
 
 type Domain = 'Payment' | 'Account' | 'Receivables' | 'Risk' | 'Connectivity';
@@ -53,8 +50,6 @@ export const APIBootstrap = () => {
   const [enableWebhooks, setEnableWebhooks] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [projectLocation, setProjectLocation] = useState('/workspace/api/');
-  const [selectedModels, setSelectedModels] = useState([]);
-  const [selectedTemplate, setSelectedTemplate] = useState('');
   const [namespace, setNamespace] = useState('');
   const [majorVersion, setMajorVersion] = useState('v1');
 

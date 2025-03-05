@@ -9,7 +9,7 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+
 
   return (
     <>

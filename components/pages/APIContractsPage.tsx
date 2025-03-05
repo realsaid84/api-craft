@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Eye, Plus, Table, Grid, Download, AlertCircle } from 'lucide-react';
+import { Search,Plus, Table, Grid, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -41,7 +41,7 @@ const ErrorAlert = ({ message }: { message: string }) => (
   </Alert>
 );
 
-const APIModelCard = ({ model, onClick, router }: { model: APIContractModel; onClick: (model: APIContractModel, router: any) => void; router: any }) => {
+const APIModelCard = ({ model, router }: { model: APIContractModel; onClick: (model: APIContractModel, router: any) => void; router: any }) => {
   try {
     return (
       <Card className="block p-6 rounded-lg border bg-card text-card-foreground  hover:bg-accent/50 transition-colors cursor-pointer"
@@ -120,7 +120,7 @@ export const APIContractsPage = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  setIsLoading(false);
   // Sample data - replace with actual data fetching
 
 
