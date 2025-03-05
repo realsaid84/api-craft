@@ -1,4 +1,4 @@
-// components/types/data-models.ts
+// components/types/api-contracts.ts
 export interface APIContractModel {
     id: string;
     name: string;
@@ -9,12 +9,7 @@ export interface APIContractModel {
     lastModified: string;
     owner: string;
     tags: string[];
-    link: string;
-    schema: {
-      type: string;
-      format?: string;
-      properties?: Record<string, unknown>;
-    };
+    schema: string;
   }
   
   export interface APIContractModelFilter {

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Filter, Plus, Table, Grid, Download, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search,Plus, Table, Grid, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -14,6 +15,8 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { APIContractModel, APIContractModelFilter } from '@/components/types/api-contracts';
+import { apiContractModels } from '@/public/data/api-models';
+
 
 // Empty State Component
 const EmptyState = ({ message }: { message: string }) => (
@@ -38,10 +41,11 @@ const ErrorAlert = ({ message }: { message: string }) => (
   </Alert>
 );
 
-const APIModelCard = ({ model }: { model: APIContractModel }) => {
+const APIModelCard = ({ model, onClick, router }: { model: APIContractModel; onClick: (model: APIContractModel, router: any) => void; router: any }) => {
   try {
     return (
-      <Card className="block p-6 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
+      <Card className="block p-6 rounded-lg border bg-card text-card-foreground  hover:bg-accent/50 transition-colors cursor-pointer"
+        onClick={() => handleModelClick(model, router)}>
         <CardHeader>
           <div className="flex justify-between items-start">
             <div>
@@ -77,8 +81,10 @@ const APIModelCard = ({ model }: { model: APIContractModel }) => {
             <div className="flex justify-between items-center text-sm text-muted-foreground">
               <span>Updated {model.lastModified}</span>
               <span>{model.owner}</span>
-            <Button variant="outline" asChild>
-                    <a href={model.link}>{'>>'}</a>
+            <Button  size="sm" className="flex items-center gap-1" 
+                variant="outline" asChild 
+                onClick={() => handleModelClick(model, router)}>
+             <span>More →</span>
             </Button>
             </div>
           </div> 
@@ -98,7 +104,14 @@ const APIModelCard = ({ model }: { model: APIContractModel }) => {
   }
 };
 
+const handleModelClick = (model: APIContractModel, router: ReturnType<typeof useRouter>) => {
+  // Navigate to the API visualizer page with model ID and schema URL as query parameters
+  router.push(`/pages/design/api-visualizer?id=${model.id}&schemaUrl=${encodeURIComponent(model.schema)}`);
+};
+
+
 export const APIContractsPage = () => {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [filter, setFilter] = useState<APIContractModelFilter>({
     search: '',
@@ -109,149 +122,7 @@ export const APIContractsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Sample data - replace with actual data fetching
-  const sampleDataModels: APIContractModel[] = [
-    {
-      id: '1',
-      name: 'Global Payments',
-      description: 'Global Payments API enabling initiation of payments across diverse methods and geograhies.',
-      version: '1.1.13',
-      domain: 'Payment',
-      status: 'Active',
-      lastModified: '2024-01-20',
-      owner: 'Treasury Services',
-      tags: ['payment', 'core'],
-      link: '/openapi/demo-payments.oas.yaml',
-      schema: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          amount: { type: 'number' },
-          currency: { type: 'string' }
-        }
-      }
-    },
-    {
-      id: '2',
-      name: 'Global Payments v2',
-      description: 'Global Payments API enabling initiation of payments across diverse methods and geograhies.',
-      version: '2.0.13',
-      domain: 'Payment',
-      status: 'Beta',
-      lastModified: '2024-01-20',
-      owner: 'Treasury Services',
-      tags: ['payment', 'core'],
-      link: '/openapi/demo-payments.oas.yaml',
-      schema: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          amount: { type: 'number' },
-          currency: { type: 'string' }
-        }
-      }
-    },
 
-    {
-      id: '3',
-      name: 'Account Balances API',
-      description: 'Enables seamless access to account information and balances',
-      version: '2.0.1',
-      domain: 'Account',
-      status: 'Active',
-      lastModified: '2025-01-20',
-      owner: 'Treasury Services',
-      tags: ['payment', 'account', 'balances', 'liquidity'],
-      link: '/openapi/demo-payments.oas.yaml',
-      schema: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          amount: { type: 'number' },
-          currency: { type: 'string' }
-        }
-      }
-    },
-    {
-      id: '4',
-      name: 'Transaction Details API',
-      description: 'Enables seamless access to transaction details and history',
-      version: '3.0.0',
-      domain: 'Payment',
-      status: 'GA',
-      lastModified: '2024-01-20',
-      owner: 'Treasury Services',
-      tags: ['payment', 'reports', 'accounts', 'transactions'],
-      link: '/openapi/demo-payments.oas.yaml',
-      schema: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          amount: { type: 'number' },
-          currency: { type: 'string' }
-        }
-      }
-    },
-    {
-      id: '5',
-      name: 'Pay By Bank API',
-      description: 'Facilitates Open Banking payments and account information services.',
-      version: '2.0.0',
-      domain: 'Receivables',
-      status: 'GA',
-      lastModified: '2024-12-02',
-      owner: 'Treasury Services',
-      tags: ['payment', 'reports', 'accounts', 'transactions'],
-      link: '/openapi/demo-payments.oas.yaml',
-      schema: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          amount: { type: 'number' },
-          currency: { type: 'string' }
-        }
-      }
-    },
-    {
-      id: '6',
-      name: 'Australia Realtime Payments API',
-      description: 'Enables initiation of real-time payments in Australia',
-      version: '1.0.0',
-      domain: 'Payment',
-      status: 'Deprecated',
-      lastModified: '2020-12-02',
-      owner: 'Treasury Services',
-      tags: ['payment', 'core'],
-      link: '/openapi/demo-payments.oas.yaml',
-      schema: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          amount: { type: 'number' },
-          currency: { type: 'string' }
-        }
-      }
-    },
-    {
-      id: '7',
-      name: 'Elrond API',
-      description: 'Faciltates payment initiation via an Elrond trust token',
-      version: '1.0.0',
-      domain: 'Risk',
-      status: 'Retired',
-      lastModified: '2020-12-02',
-      owner: 'Treasury Services',
-      tags: ['risk', 'core'],
-      link: '/openapi/demo-payments.oas.yaml',
-      schema: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' },
-          amount: { type: 'number' },
-          currency: { type: 'string' }
-        }
-      }
-    }
-  ];
 
   const filterModels = (models: APIContractModel[]) => {
     try {
@@ -274,7 +145,7 @@ export const APIContractsPage = () => {
     }
   };
 
-  const filteredModels = filterModels(sampleDataModels);
+  const filteredModels = filterModels(apiContractModels);
 
   const handleFilterChange = (type: keyof APIContractModelFilter, value: string) => {
     try {
@@ -288,16 +159,18 @@ export const APIContractsPage = () => {
     }
   };
 
+
   if (error) {
     return <ErrorAlert message={error} />;
   }
 
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-8 lg:p-10">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold">API Contracts</h1>
-        <p className="text-xl text-muted-foreground">
-          Discover and manage API contracts across different domains.
+    <div className="flex-1 overflow-auto">
+      <div className="max-w-6xl mx-auto p-8">
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold text-teal-600">API Contracts</h1>
+          <p className="text-xl text-muted-foreground mb-6">
+            Discover and manage API contracts across different domains.
         </p>
       </div>
 
@@ -366,7 +239,7 @@ export const APIContractsPage = () => {
                 <Table className="h-4 w-4" />
               </Button>
             </div>
-            <Button>
+            <Button onClick={() => router.push(`/pages/design/api-boot`)}>
               <Plus className="w-4 h-4 mr-2" />
               New API Contract
             </Button>
@@ -386,7 +259,7 @@ export const APIContractsPage = () => {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ml-4">
             {filteredModels.map((model) => (
-              <APIModelCard key={model.id} model={model} />
+              <APIModelCard key={model.id} model={model} onClick={handleModelClick} router={router} />
             ))}
           </div>
         ) : (
@@ -404,7 +277,7 @@ export const APIContractsPage = () => {
               </thead>
               <tbody>
                 {filteredModels.map((model) => (
-                  <tr key={model.id} className="border-b last:border-0">
+                   <tr key={model.id} className="border-b last:border-0 hover:bg-accent/50 cursor-pointer" onClick={() => handleModelClick(model, router)}>
                     <td className="py-3 px-4">
                       <div>
                         <div className="text-lg text-teal-600 font-medium
@@ -435,6 +308,7 @@ export const APIContractsPage = () => {
             </table>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

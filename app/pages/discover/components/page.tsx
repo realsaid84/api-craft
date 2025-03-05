@@ -1,7 +1,7 @@
-import { APIComponentsPage } from '@/components/pages';
+import ComingSoonPage  from '@/components/pages/ComingSoonPage';
 
 export default function Page() {
-    return <APIComponentsPage />;
+    return <ComingSoonPage />;
   }
   
 
