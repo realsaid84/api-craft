@@ -1,6 +1,6 @@
 // components/utils/pageFactory.tsx
 import React from 'react';
-import PageLayout from '../layouts/LearnLayout';
+import PageLayout from '../layouts/MainLayout';
 import { BasePageProps } from '../types';
 
 interface PageFactoryProps extends BasePageProps {
