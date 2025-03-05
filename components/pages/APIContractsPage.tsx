@@ -239,7 +239,7 @@ export const APIContractsPage = () => {
                 <Table className="h-4 w-4" />
               </Button>
             </div>
-            <Button>
+            <Button onClick={() => router.push(`/pages/design/api-editor`)}>
               <Plus className="w-4 h-4 mr-2" />
               New API Contract
             </Button>
