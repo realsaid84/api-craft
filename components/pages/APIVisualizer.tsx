@@ -271,7 +271,7 @@ const handleQualityMetricsClick = () => {
               variant="ghost" 
               size="sm" 
               className="flex items-center gap-1"
-              onClick={() => router.push('/learn/openapi-cheatsheet')}
+              onClick={() => router.push('/pages/learn/openapi-cheatsheet')}
             >
               <BookOpen className="h-4 w-4" />
               <span>OpenAPI Cheatsheet</span>

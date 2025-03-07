@@ -17,7 +17,11 @@ import {
   CardContent
 } from '@/components/ui/card';
 
-type Domain = 'Payment' | 'Account' | 'Receivables' | 'Risk' | 'Connectivity';
+type Domain = 'Payment' | 'Account' | 'Receivables' | 'Risk' | 'Connectivity' | 'Trade Finance'| 'Acquiring' 
+| 'Liquidity' | 'Marketplace' | 'Commercial Card' | 'User' | 'Shared Services';
+
+type Namespace = 'payment' | 'account' | 'receivables' | 'trust-safety' | 'connectivity' | 'trade-finance'
+| 'commerce' | 'liquidity' | 'marketplace' | 'commercial-card' | '--custom--';
 
 const sampleDataModels = [
   { id: '1', name: 'Payment Instruction', version: '1.1.13', domain: 'Payment' },
@@ -37,7 +41,11 @@ const apiTemplates = [
   { id: '3', name: 'GraphQL API Template', type: 'GraphQL' },
 ];
 
-const domains: Domain[] = ['Payment', 'Account', 'Receivables', 'Risk', 'Connectivity'];
+const domains: Domain[] = ['Payment', 'Account', 'Receivables', 'Risk', 'Connectivity' ,'Trade Finance', 'Acquiring' 
+, 'Liquidity' , 'Marketplace' , 'Commercial Card' , 'User' , 'Shared Services'];
+
+const namespaces: Namespace[] = ['payment' , 'account' , 'receivables' , 'trust-safety' , 'connectivity' , 'trade-finance'
+, 'commerce' , 'liquidity' , 'marketplace' , 'commercial-card', '--custom--'];
 
 const securitySchemes = [
   { id: 'jwt', name: 'JWT Bearer' },
@@ -115,13 +123,19 @@ export const APIBootstrap = () => {
                     </div>
 
                     {/* Namespace */}
+
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-teal-600">Namespace (basePath)</label>
-                      <Input 
-                        placeholder="payment"
-                        value={namespace}
-                        onChange={(e) => setNamespace(e.target.value)}
-                      />
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a namespace" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {namespaces.map(namespace => (
+                            <SelectItem key={namespace} value={namespace}>{namespace}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                        <div className="flex items-center text-sm text-teal-600">
                         <ExternalLink className="h-4 w-4 mr-1" />
                         <a href="https://go/payments-api-env" className="hover:underline">Discover approved namespaces</a>
@@ -235,7 +249,7 @@ export const APIBootstrap = () => {
                       <label className="text-sm font-medium text-teal-600">Domain</label>
                       <Select>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select domain" />
+                          <SelectValue placeholder="Select a domain" />
                         </SelectTrigger>
                         <SelectContent>
                           {domains.map(domain => (

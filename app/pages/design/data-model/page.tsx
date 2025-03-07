@@ -1,6 +1,6 @@
-import ComingSoonPage  from '@/components/pages/ComingSoonPage';
+import DataModelEditor  from '@/components/pages/data-model-editor/DataModelEditor';
 
 // In your page component
-export default function Page() {
-  return <ComingSoonPage />;
+export default function DataModelEditorPage() {
+  return <DataModelEditor />;
 }
