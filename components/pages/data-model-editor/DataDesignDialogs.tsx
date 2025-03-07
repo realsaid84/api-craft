@@ -396,23 +396,23 @@ export const BootstrapAPIDialog: React.FC<BootstrapAPIDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Export Model</DialogTitle>
+          <DialogTitle>Bootstrap API</DialogTitle>
           <DialogDescription>
-            Choose format to export your data model.
+            Choose an API specification standard to bootstrap your data model to.
           </DialogDescription>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="export-format" className="text-right">
-              Format
+              Specification Standard
             </Label>
             <Select 
               value={apiSpec} 
               onValueChange={setApiSpec}
             >
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select export format" />
+                <SelectValue placeholder="Select Specification Standard" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="openapi3">OpenAPI 3.0</SelectItem>
