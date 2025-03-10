@@ -5,8 +5,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { xonokai } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { convertToGherkin, convertToArazzo } from './Generator';
-import { Clipboard, CheckCheck } from 'lucide-react';
+import { Clipboard, CheckCheck, FileCode, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import yaml from 'js-yaml';
 
 interface FeaturePreviewProps {
   features: any[];
@@ -16,6 +18,7 @@ interface FeaturePreviewProps {
 const FeaturePreview: React.FC<FeaturePreviewProps> = ({ features, format }) => {
   const [selectedFeature, setSelectedFeature] = useState<string>(features[0]?.name || '');
   const [copied, setCopied] = useState<boolean>(false);
+  const [displayFormat, setDisplayFormat] = useState<'json' | 'yaml'>('yaml');
 
   // Get the selected feature object
   const getSelectedFeature = () => {
@@ -49,6 +52,16 @@ const FeaturePreview: React.FC<FeaturePreviewProps> = ({ features, format }) => 
       });
   };
 
+  // Function to convert JSON to YAML
+  const jsonToYaml = (jsonContent: string) => {
+    try {
+      const jsonObj = JSON.parse(jsonContent);
+      return yaml.dump(jsonObj);
+    } catch (e) {
+      return jsonContent; // Return original if not valid JSON
+    }
+  };
+
   // No features
   if (features.length === 0) {
     return (
@@ -79,33 +92,45 @@ const FeaturePreview: React.FC<FeaturePreviewProps> = ({ features, format }) => 
           </Select>
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCopy}
-          className="gap-1"
-        >
-          {copied ? (
-            <>
-              <CheckCheck className="h-4 w-4" />
-              <span>Copied!</span>
-            </>
-          ) : (
-            <>
-              <Clipboard className="h-4 w-4" />
-              <span>Copy</span>
-            </>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setDisplayFormat(displayFormat === 'json' ? 'yaml' : 'json')}
+            className="gap-1"
+          >
+            <FileCode className="h-4 w-4" />
+            <span>{displayFormat === 'json' ? 'YAML' : 'JSON'}</span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopy}
+            className="gap-1"
+          >
+            {copied ? (
+              <>
+                <CheckCheck className="h-4 w-4" />
+                <span>Copied!</span>
+              </>
+            ) : (
+              <>
+                <Clipboard className="h-4 w-4" />
+                <span>Copy</span>
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       <Card className="border rounded-md overflow-hidden">
         <CardContent className="p-0">
-          <Tabs defaultValue="code" className="w-full">
+          <Tabs defaultValue="postman" className="w-full">
             <div className="border-b">
               <TabsList className="bg-transparent px-4 pt-2">
-                <TabsTrigger value="code">Code</TabsTrigger>
-                <TabsTrigger value="structure">Structure</TabsTrigger>
+                <TabsTrigger value="postman">API Client View</TabsTrigger>
+                <TabsTrigger value="code">Raw Code</TabsTrigger>
               </TabsList>
             </div>
 
@@ -125,8 +150,12 @@ const FeaturePreview: React.FC<FeaturePreviewProps> = ({ features, format }) => 
               </SyntaxHighlighter>
             </TabsContent>
 
-            <TabsContent value="structure" className="m-0 p-4">
-              <FeatureStructureView feature={getSelectedFeature()} />
+            <TabsContent value="postman" className="m-0 p-0">
+              <PostmanStyleView 
+                feature={getSelectedFeature()} 
+                displayFormat={displayFormat}
+                jsonToYaml={jsonToYaml}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>
@@ -140,123 +169,308 @@ const FeaturePreview: React.FC<FeaturePreviewProps> = ({ features, format }) => 
   );
 };
 
-// Component to display feature structure in a tree-like view
-const FeatureStructureView: React.FC<{ feature: any }> = ({ feature }) => {
+// Component to display feature in Postman-like style
+const PostmanStyleView: React.FC<{ 
+  feature: any; 
+  displayFormat: 'json' | 'yaml';
+  jsonToYaml: (json: string) => string;
+}> = ({ feature, displayFormat, jsonToYaml }) => {
   if (!feature) return null;
-
-  // Function to try parsing JSON and determine if content is valid JSON
-  const parseJsonContent = (content: string) => {
-    try {
-      const parsed = JSON.parse(content);
-      return {
-        valid: true,
-        parsed
-      };
-    } catch (e) {
-      return {
-        valid: false,
-        parsed: null
-      };
-    }
+  
+  // Class map for HTTP method colors
+  const methodColors: Record<string, string> = {
+    get: "bg-blue-500 text-white",
+    post: "bg-orange-500 text-white",
+    put: "bg-green-600 text-white",
+    delete: "bg-red-500 text-white",
+    patch: "bg-purple-500 text-white",
+    options: "bg-gray-500 text-white",
+    head: "bg-gray-700 text-white"
   };
 
-  // Function to render content with proper syntax highlighting based on type
-  const renderContent = (content: string, language: string = 'json') => {
-    if (language === 'json') {
-      const { valid, parsed } = parseJsonContent(content);
-      if (valid) {
-        return (
-          <SyntaxHighlighter
-            language="json"
-            style={xonokai}
-            customStyle={{
-              margin: '0.5rem 0',
-              borderRadius: '0.25rem',
-              fontSize: '0.8rem'
-            }}
-          >
-            {JSON.stringify(parsed, null, 2)}
-          </SyntaxHighlighter>
-        );
+  // Extract scenarios grouped by HTTP method
+  const scenariosByMethod = feature.scenarios.reduce((acc: any, scenario: any) => {
+    // Find the step with the HTTP method
+    const methodStep = scenario.steps.find((step: any) => 
+      step.text.includes('send a') && step.text.includes('request to')
+    );
+    
+    if (methodStep) {
+      const methodMatch = methodStep.text.match(/send a ([A-Z]+) request/);
+      if (methodMatch && methodMatch[1]) {
+        const method = methodMatch[1].toLowerCase();
+        if (!acc[method]) acc[method] = [];
+        acc[method].push({...scenario, method, methodStep});
       }
     }
     
-    // Default case or non-JSON content
-    return (
-      <SyntaxHighlighter
-        language={language}
-        style={xonokai}
-        customStyle={{
-          margin: '0.5rem 0',
-          borderRadius: '0.25rem',
-          fontSize: '0.8rem'
-        }}
-      >
-        {content}
-      </SyntaxHighlighter>
-    );
+    return acc;
+  }, {});
+
+  // Get the first scenario for the currently selected tab
+  const [selectedMethod, setSelectedMethod] = useState<string>(
+    Object.keys(scenariosByMethod)[0] || 'get'
+  );
+  
+  // Get the path for display in URL bar
+  const getPathForCurrentScenario = () => {
+    if (scenariosByMethod[selectedMethod]?.[0]) {
+      const methodStep = scenariosByMethod[selectedMethod][0].methodStep;
+      const pathMatch = methodStep.text.match(/request to \"([^\"]+)\"/);
+      return pathMatch?.[1] || '/';
+    }
+    return '/';
   };
 
+  // Extract parameters from a step's text
+  const extractParams = (stepText: string) => {
+    if (stepText.includes('parameters:')) {
+      const paramsText = stepText.split('parameters:')[1].trim();
+      const params: { name: string, value: string }[] = [];
+      
+      // Split by commas, but respect quotes
+      let inQuote = false;
+      let currentParam = '';
+      let paramBuffer = '';
+      
+      for (let i = 0; i < paramsText.length; i++) {
+        const char = paramsText[i];
+        
+        if (char === '"' || char === "'") {
+          inQuote = !inQuote;
+          paramBuffer += char;
+        } else if (char === '=' && !inQuote && currentParam === '') {
+          currentParam = paramBuffer.trim();
+          paramBuffer = '';
+        } else if (char === ',' && !inQuote) {
+          // Complete this param
+          if (currentParam) {
+            params.push({ name: currentParam, value: paramBuffer.trim() });
+            currentParam = '';
+            paramBuffer = '';
+          }
+        } else {
+          paramBuffer += char;
+        }
+      }
+      
+      // Add the last param
+      if (currentParam) {
+        params.push({ name: currentParam, value: paramBuffer.trim() });
+      }
+      
+      return params;
+    }
+    return [];
+  };
+
+  // Extract request body from a scenario
+  const extractRequestBody = (scenario: any) => {
+    const requestBodyStep = scenario.steps.find((step: any) => 
+      step.text.includes('request body')
+    );
+    
+    if (requestBodyStep?.codeBlock) {
+      try {
+        if (displayFormat === 'yaml') {
+          return jsonToYaml(requestBodyStep.codeBlock.content);
+        } else {
+          return JSON.stringify(JSON.parse(requestBodyStep.codeBlock.content), null, 2);
+        }
+      } catch (e) {
+        return requestBodyStep.codeBlock.content;
+      }
+    }
+    
+    return null;
+  };
+
+  // Current scenario we're viewing
+  const currentScenario = scenariosByMethod[selectedMethod]?.[0];
+
   return (
-    <div className="space-y-4 max-h-[550px] overflow-auto p-2">
-      <div className="mb-4">
-        <h3 className="text-lg font-bold">{feature.name}</h3>
-        {feature.description && (
-          <p className="text-gray-600">{feature.description}</p>
-        )}
-      </div>
-
-      {feature.background && (
-        <div className="mb-4 border-l-2 border-blue-400 pl-4">
-          <h4 className="font-semibold text-blue-600">Background: {feature.background.title}</h4>
-          <ul className="mt-2 space-y-1">
-            {feature.background.steps.map((step: any, index: number) => (
-              <li key={index} className="text-gray-700">
-                <span className="text-blue-500 font-medium">{step.type}</span> {step.text}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <div className="space-y-6">
-        {feature.scenarios.map((scenario: any, scenarioIndex: number) => (
-          <div key={scenarioIndex} className="border-l-2 border-green-400 pl-4">
-            <h4 className="font-semibold text-green-600">{scenario.name}</h4>
-            <ul className="mt-2 space-y-2">
-              {scenario.steps.map((step: any, stepIndex: number) => (
-                <li key={stepIndex} className="text-gray-700">
-                  <div className="flex items-start">
-                    <span 
-                      className={`font-medium mr-2 ${
-                        step.type === 'Given' ? 'text-purple-500' : 
-                        step.type === 'When' ? 'text-amber-500' : 
-                        'text-green-500'
-                      }`}
-                    >
-                      {step.type}
-                    </span> 
-                    <span className="flex-1">{step.text}</span>
+    <div className="h-[550px] overflow-auto bg-white">
+      {/* Left sidebar with HTTP methods */}
+      <div className="flex h-full">
+        <div className="w-[400px] border-r bg-gray-50 overflow-y-auto">
+          {/* List of scenarios by HTTP method */}
+          {Object.entries(scenariosByMethod).map(([method, scenarios]) => (
+            <div key={method}>
+              {(scenarios as any[]).map((scenario: any, idx: number) => (
+                <div 
+                  key={`${method}-${idx}`}
+                  className={`p-3 border-b hover:bg-gray-100 cursor-pointer ${selectedMethod === method ? 'bg-gray-200' : ''}`}
+                  onClick={() => setSelectedMethod(method)}
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge className={`font-mono text-xs px-2 ${methodColors[method]}`}>
+                      {method.toUpperCase()}
+                    </Badge>
+                    <div className="font-medium truncate">{scenario.name}</div>
                   </div>
-                  
-                  {/* Render code blocks with syntax highlighting */}
-                  {step.codeBlock && (
-                    <div className="ml-6 mt-2">
-                      {renderContent(step.codeBlock.content, step.codeBlock.language)}
-                    </div>
-                  )}
-                  
-                  {/* Handle special cases for parameters and request body mentions without code blocks */}
-                  {!step.codeBlock && step.text.includes('parameters:') && (
-                    <div className="ml-6 mt-2 bg-gray-800 text-gray-200 p-2 rounded text-sm">
-                      {step.text.split('parameters:')[1].trim()}
-                    </div>
-                  )}
-                </li>
+                  <div className="text-xs text-gray-500 mt-1 ml-12 truncate">
+                    {getPathForCurrentScenario()}
+                  </div>
+                </div>
               ))}
-            </ul>
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
+        
+        {/* Main content area */}
+        <div className="flex-1 overflow-y-auto">
+          {currentScenario ? (
+            <>
+              {/* URL bar */}
+              <div className="p-4 border-b flex items-center gap-2">
+                <Badge className={`font-mono text-xs px-2 ${methodColors[selectedMethod]}`}>
+                  {selectedMethod.toUpperCase()}
+                </Badge>
+                <div className="bg-gray-100 flex-1 px-3 py-2 rounded text-gray-800 font-mono text-sm">
+                  https://api.example.com{getPathForCurrentScenario()}
+                </div>
+              </div>
+
+              {/* Parameters and body tabs */}
+              <div className="border-b">
+                <Tabs defaultValue="params">
+                  <TabsList className="px-4 pt-2">
+                    <TabsTrigger value="params">Params</TabsTrigger>
+                    <TabsTrigger value="body">Body</TabsTrigger>
+                    <TabsTrigger value="response">Response</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="params" className="p-0 m-0">
+                    <div className="p-4">
+                      {/* Extract query and path parameters */}
+                      {currentScenario.steps.some((step: any) => step.text.includes('parameters')) ? (
+                        <div>
+                          <table className="w-full">
+                            <thead className="bg-gray-50 text-left">
+                              <tr>
+                                <th className="p-2 border-y w-8"></th>
+                                <th className="p-2 border-y">Name</th>
+                                <th className="p-2 border-y">Value</th>
+                                <th className="p-2 border-y">Type</th>
+                                <th className="p-2 border-y">Description</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {currentScenario.steps
+                                .filter((step: any) => step.text.includes('parameters'))
+                                .flatMap((step: any) => {
+                                  const params = extractParams(step.text);
+                                  const paramType = step.text.includes('path parameters') ? 'path' : 'query';
+                                  
+                                  return params.map((param, idx) => (
+                                    <tr key={`${paramType}-${param.name}-${idx}`} className="border-b">
+                                      <td className="p-2">
+                                        <div className="flex justify-center">
+                                          <Check className="h-4 w-4 text-green-500" />
+                                        </div>
+                                      </td>
+                                      <td className="p-2 font-medium">{param.name}</td>
+                                      <td className="p-2">{param.value.replace(/"/g, '')}</td>
+                                      <td className="p-2 text-sm">
+                                        <Badge variant="outline" className="bg-green-50 text-green-700 font-normal">
+                                          string
+                                        </Badge>
+                                      </td>
+                                      <td className="p-2 text-gray-500 text-sm">
+                                        {paramType === 'path' ? 'Path Parameter' : 'Query Parameter'}
+                                      </td>
+                                    </tr>
+                                  ));
+                                })}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="text-gray-500 text-center py-4">
+                          No parameters defined for this request
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="body" className="p-0 m-0">
+                    <div className="p-4">
+                      {/* Display request body if present */}
+                      {extractRequestBody(currentScenario) ? (
+                        <div>
+                          <div className="flex gap-4 mb-4">
+                            {['none', 'form-data', 'x-www-form-urlencoded', 'json', 'xml', 'raw', 'binary'].map(format => (
+                              <div 
+                                key={format}
+                                className={`px-3 py-1 text-sm rounded cursor-pointer
+                                  ${format === 'json' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'}`}
+                              >
+                                {format}
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="border rounded-md bg-gray-50 p-4 font-mono text-sm whitespace-pre">
+                            {extractRequestBody(currentScenario)}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-gray-500 text-center py-4">
+                          No request body defined
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="response" className="p-0 m-0">
+                    <div className="p-4">
+                      {/* Display expected response */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="text-gray-700 font-medium">Expected Status:</div>
+                          <Badge className="bg-green-100 text-green-800 font-medium">
+                            {currentScenario.steps.find((step: any) => step.text.includes('status should be'))?.text.match(/should be (\d+)/)?.[1] || '200'}
+                          </Badge>
+                        </div>
+                        
+                        <div className="mb-2 text-gray-700 font-medium">Expected Response:</div>
+                        
+                        {currentScenario.steps.some((step: any) => 
+                          step.text.includes('response should') && !step.text.includes('status should')
+                        ) ? (
+                          <div className="border rounded-md bg-gray-50 p-4 font-mono text-sm">
+                            {/* Simplified for illustration; more complex logic would be needed for real response structure */}
+                            {displayFormat === 'yaml' ? (
+                              jsonToYaml(JSON.stringify({
+                                result: "success",
+                                status: "created", 
+                                data: { id: 123, name: "Example" }
+                              }))
+                            ) : (
+                              JSON.stringify({
+                                result: "success",
+                                status: "created", 
+                                data: { id: 123, name: "Example" }
+                              }, null, 2)
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-gray-500">
+                            No specific response structure defined
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </>
+          ) : (
+            <div className="p-8 text-center text-gray-500">
+              No scenarios available for this feature
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
