@@ -80,12 +80,17 @@ struct Customer:
   string customerType
 `;
 
-const DataModelCard = ({ model, onClick }: { model: DataModel; onClick: (model: DataModel) => void }) => {
+const handleModelClick = (model: DataModel, router: ReturnType<typeof useRouter>) => {
+  // Navigate to the data model view page with the model ID as a query parameter
+  router.push(`/pages/discover/data-model-view?id=${model.id}&schemaUrl=${encodeURIComponent(model.schema)}&modelUrl=${encodeURIComponent(model.erDiagram)}`);
+};
+
+const DataModelCard = ({ model, onClick, router  }: { model: DataModel; onClick: (model: DataModel, router: any) => void; router: any }) => {
   try {
     return (
       <Card 
         className="block p-6 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors cursor-pointer"
-        onClick={() => onClick(model)}
+        onClick={() => handleModelClick(model, router)}
       >
         <CardHeader>
           <div className="flex justify-between items-start">
@@ -119,6 +124,11 @@ const DataModelCard = ({ model, onClick }: { model: DataModel; onClick: (model: 
               <span>Updated {model.lastModified}</span>
               <span>{model.owner}</span>
             </div>
+            <Button  size="sm" className="px-4 py-2 bg-gray-100 text-teal-600 rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer" 
+                variant="outline" asChild 
+                onClick={() => handleModelClick(model, router)}>
+              <span>More →</span>
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -148,6 +158,8 @@ export const DataModelsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showJsonDialog, setShowJsonDialog] = useState(false);
   const [modelInput, setModelInput] = useState(demoDataModel);
+
+    
   const filterModels = (models: DataModel[]) => {
     try {
       return models.filter(model => {
@@ -183,10 +195,6 @@ export const DataModelsPage = () => {
     }
   };
 
-  const handleModelClick = (model: DataModel) => {
-    // Navigate to the data model view page with the model ID as a query parameter
-    router.push(`/pages/discover/data-model-view?id=${model.id}&schemaUrl=${encodeURIComponent(model.schema)}&modelUrl=${encodeURIComponent(model.erDiagram)}`);
-  };
 
   const handleGenerateSchema = () => {
       // Update the schema safely
@@ -291,7 +299,7 @@ export const DataModelsPage = () => {
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ml-4">
               {filteredModels.map((model) => (
-                <DataModelCard key={model.id} model={model} onClick={handleModelClick} />
+                <DataModelCard key={model.id} model={model} onClick={handleModelClick} router={router}/>
               ))}
             </div>
           ) : (
@@ -310,7 +318,7 @@ export const DataModelsPage = () => {
                 </thead>
                 <tbody>
                   {filteredModels.map((model) => (
-                    <tr key={model.id} className="border-b last:border-0 hover:bg-accent/50 cursor-pointer" onClick={() => handleModelClick(model)}>
+                    <tr key={model.id} className="border-b last:border-0 hover:bg-accent/50 cursor-pointer" onClick={() => handleModelClick(model,router)}>
                       <td className="py-3 px-4">
                         <div>
                           <div className="text-lg text-teal-600 font-medium">{model.name}</div>
@@ -333,7 +341,7 @@ export const DataModelsPage = () => {
                       <td className="py-3 px-4">
                         <Button variant="ghost" size="sm" className="text-teal-600" onClick={(e) => {
                           e.stopPropagation();
-                          handleModelClick(model);
+                          handleModelClick(model,router);
                         }}>
                           View Model
                         </Button>
@@ -387,6 +395,7 @@ export const DataModelsPage = () => {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
     </div>
   );
 };

@@ -58,7 +58,7 @@ const DataDesignEditor: React.FC = () => {
   const [viewTab, setViewTab] = useState<'code' | 'form' | 'preview'>('code');
   const [designTab, setDesignTab] = useState<'entities' | 'relationships' | 'attributes'>('entities');
   const [isInternal, setIsInternal] = useState<boolean>(false);
-  const [modelName, setModelName] = useState<string>('Payment Instruction Domain Model');
+  const [modelName, setModelName] = useState<string>('Greenfield Domain Model');
   const [warningCount] = useState<number>(2);
   const [showExportDialog, setShowExportDialog] = useState<boolean>(false);
   const [showBootstrapAPIDialog, setShowBootstrapAPIDialog] = useState<boolean>(false);

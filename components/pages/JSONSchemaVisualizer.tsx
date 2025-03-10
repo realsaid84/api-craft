@@ -39,6 +39,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import mermaid from 'mermaid';
+import { BootstrapAPIDialog, ForwardEngineerDialog } from './data-model-editor/DataDesignDialogs';
 
 
 // Initialize mermaid
@@ -159,6 +160,10 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
   const [schema, setSchema] = useState(initialSchema);
   const [markdownModel, setMarkdownModel] = useState<string | undefined>(initialMarkdownModel);
   const [schemaUrl, setSchemaUrl] = useState<string | undefined>(initialSchemaUrl);
+  const [showBootstrapAPIDialog, setShowBootstrapAPIDialog] = useState<boolean>(false);
+  const [showFEDialog, setShowFEDialog] = useState<boolean>(false);
+  const [apiSpec, setAPISpec] = useState<string>('openapi3');
+  const [target, setTarget] = useState<string>('json');
 
   const modelTitle = modelName || schema.title || title;
 
@@ -456,6 +461,7 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
               variant="outline" 
               size="sm" 
               className="gap-2 px-2"
+              onClick={() =>  router.push('/pages/design/data-model')}
             >
               <Plus className="h-4 w-4" />
             </Button>
@@ -476,11 +482,13 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-2 text-gray-700">
+              <Button variant="outline" size="sm" className="gap-2 text-gray-700"
+                    onClick={() => setShowBootstrapAPIDialog(true)}>
                 <Code className="h-4 w-4" />
                 <span>Bootstrap API</span>
               </Button>
-              <Button variant="outline" size="sm" className="gap-2 text-gray-700">
+              <Button variant="outline" size="sm" className="gap-2 text-gray-700"
+                    onClick={() => setShowFEDialog(true)}>
                 <Workflow className="h-4 w-4" />
                 <span>Forward Engineer</span>
               </Button>                  
@@ -744,6 +752,20 @@ export const SchemaVisualizer: React.FC<SchemaVisualizerProps> = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <BootstrapAPIDialog
+            open={showBootstrapAPIDialog}
+            onOpenChange={setShowBootstrapAPIDialog}
+            apiSpec={apiSpec}
+            setApiSpec={setAPISpec}
+          />
+    
+      <ForwardEngineerDialog
+        open={showFEDialog}
+        onOpenChange={setShowFEDialog}
+        target={target}
+        setTarget={setTarget}
+      />
      </div>
   );
 };
