@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { xonokai } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { convertToGherkin, convertToArazzo } from './Generator';
-import { Clipboard, CheckCheck, FileCode, Check } from 'lucide-react';
+import { Clipboard, CheckCheck, FileCode, Check, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import yaml from 'js-yaml';
@@ -19,6 +19,7 @@ const FeaturePreview: React.FC<FeaturePreviewProps> = ({ features, format }) => 
   const [selectedFeature, setSelectedFeature] = useState<string>(features[0]?.name || '');
   const [copied, setCopied] = useState<boolean>(false);
   const [displayFormat, setDisplayFormat] = useState<'json' | 'yaml'>('yaml');
+  const [viewMode, setViewMode] = useState<'client' | 'karate' | 'code'>('client');
 
   // Get the selected feature object
   const getSelectedFeature = () => {
@@ -93,6 +94,36 @@ const FeaturePreview: React.FC<FeaturePreviewProps> = ({ features, format }) => 
         </div>
 
         <div className="flex gap-2">
+          <div className="border rounded-md overflow-hidden flex">
+            <Button 
+              variant={viewMode === 'client' ? 'default' : 'ghost'} 
+              size="sm" 
+              onClick={() => setViewMode('client')}
+              className="gap-1 rounded-none"
+            >
+              <Code className="h-4 w-4" />
+              <span>API Client</span>
+            </Button>
+            <Button 
+              variant={viewMode === 'karate' ? 'default' : 'ghost'} 
+              size="sm" 
+              onClick={() => setViewMode('karate')}
+              className="gap-1 rounded-none"
+            >
+              <Code className="h-4 w-4" />
+              <span>Karate</span>
+            </Button>
+            <Button 
+              variant={viewMode === 'code' ? 'default' : 'ghost'} 
+              size="sm" 
+              onClick={() => setViewMode('code')}
+              className="gap-1 rounded-none"
+            >
+              <FileCode className="h-4 w-4" />
+              <span>Raw Code</span>
+            </Button>
+          </div>
+          
           <Button
             variant="outline"
             size="sm"
@@ -126,38 +157,37 @@ const FeaturePreview: React.FC<FeaturePreviewProps> = ({ features, format }) => 
 
       <Card className="border rounded-md overflow-hidden">
         <CardContent className="p-0">
-          <Tabs defaultValue="postman" className="w-full">
-            <div className="border-b">
-              <TabsList className="bg-transparent px-4 pt-2">
-                <TabsTrigger value="postman">API Client View</TabsTrigger>
-                <TabsTrigger value="code">Raw Code</TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value="code" className="p-0 m-0">
-              <SyntaxHighlighter
-                language={codeLanguage}
-                style={xonokai}
-                showLineNumbers={true}
-                customStyle={{
-                  margin: 0,
-                  borderRadius: '0',
-                  height: '550px',
-                  fontSize: '0.9rem'
-                }}
-              >
-                {formattedContent}
-              </SyntaxHighlighter>
-            </TabsContent>
-
-            <TabsContent value="postman" className="m-0 p-0">
-              <PostmanStyleView 
-                feature={getSelectedFeature()} 
-                displayFormat={displayFormat}
-                jsonToYaml={jsonToYaml}
-              />
-            </TabsContent>
-          </Tabs>
+          {viewMode === 'client' && (
+            <PostmanStyleView 
+              feature={getSelectedFeature()} 
+              displayFormat={displayFormat}
+              jsonToYaml={jsonToYaml}
+            />
+          )}
+          
+          {viewMode === 'karate' && (
+            <KarateStyleView 
+              feature={getSelectedFeature()} 
+              displayFormat={displayFormat}
+              jsonToYaml={jsonToYaml}
+            />
+          )}
+          
+          {viewMode === 'code' && (
+            <SyntaxHighlighter
+              language={codeLanguage}
+              style={xonokai}
+              showLineNumbers={true}
+              customStyle={{
+                margin: 0,
+                borderRadius: '0',
+                height: '550px',
+                fontSize: '0.9rem'
+              }}
+            >
+              {formattedContent}
+            </SyntaxHighlighter>
+          )}
         </CardContent>
       </Card>
 
@@ -465,6 +495,260 @@ const PostmanStyleView: React.FC<{
                 </Tabs>
               </div>
             </>
+          ) : (
+            <div className="p-8 text-center text-gray-500">
+              No scenarios available for this feature
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Component to display feature in Karate-style
+const KarateStyleView: React.FC<{ 
+  feature: any; 
+  displayFormat: 'json' | 'yaml';
+  jsonToYaml: (json: string) => string;
+}> = ({ feature, displayFormat, jsonToYaml }) => {
+  if (!feature) return null;
+  
+  // Class map for HTTP method colors
+  const methodColors: Record<string, string> = {
+    get: "bg-blue-500 text-white",
+    post: "bg-orange-500 text-white",
+    put: "bg-green-600 text-white",
+    delete: "bg-red-500 text-white",
+    patch: "bg-purple-500 text-white",
+    options: "bg-gray-500 text-white",
+    head: "bg-gray-700 text-white"
+  };
+
+  // Extract scenarios grouped by HTTP method
+  const scenariosByMethod = feature.scenarios.reduce((acc: any, scenario: any) => {
+    // Find the step with the HTTP method
+    const methodStep = scenario.steps.find((step: any) => 
+      step.text.includes('send a') && step.text.includes('request to')
+    );
+    
+    if (methodStep) {
+      const methodMatch = methodStep.text.match(/send a ([A-Z]+) request/);
+      if (methodMatch && methodMatch[1]) {
+        const method = methodMatch[1].toLowerCase();
+        if (!acc[method]) acc[method] = [];
+        acc[method].push({...scenario, method, methodStep});
+      }
+    }
+    
+    return acc;
+  }, {});
+
+  // Get the first scenario for the currently selected tab
+  const [selectedMethod, setSelectedMethod] = useState<string>(
+    Object.keys(scenariosByMethod)[0] || 'get'
+  );
+
+  // Extract path from the current scenario
+  const getPathForCurrentScenario = () => {
+    if (scenariosByMethod[selectedMethod]?.[0]) {
+      const methodStep = scenariosByMethod[selectedMethod][0].methodStep;
+      const pathMatch = methodStep.text.match(/request to \"([^\"]+)\"/);
+      return pathMatch?.[1] || '/';
+    }
+    return '/';
+  };
+  
+  // Extract request body from a scenario
+  const extractRequestBody = (scenario: any) => {
+    const requestBodyStep = scenario.steps.find((step: any) => 
+      step.text.includes('request body')
+    );
+    
+    if (requestBodyStep?.codeBlock) {
+      try {
+        if (displayFormat === 'yaml') {
+          return jsonToYaml(requestBodyStep.codeBlock.content);
+        } else {
+          return JSON.stringify(JSON.parse(requestBodyStep.codeBlock.content), null, 2);
+        }
+      } catch (e) {
+        return requestBodyStep.codeBlock.content;
+      }
+    }
+    
+    return null;
+  };
+
+  // Extract path parameters from a scenario
+  const extractPathParams = (scenario: any) => {
+    const pathParamStep = scenario.steps.find((step: any) => 
+      step.text.includes('path parameters')
+    );
+    
+    if (pathParamStep) {
+      const paramText = pathParamStep.text.split('path parameters:')[1].trim();
+      return paramText.split(',').map((param: string) => {
+        const [name, value] = param.split('=').map(p => p.trim());
+        return { name, value: value.replace(/"/g, '') };
+      });
+    }
+    
+    return [];
+  };
+
+  // Extract query parameters from a scenario
+  const extractQueryParams = (scenario: any) => {
+    const queryParamStep = scenario.steps.find((step: any) => 
+      step.text.includes('query parameters')
+    );
+    
+    if (queryParamStep) {
+      const paramText = queryParamStep.text.split('query parameters:')[1].trim();
+      return paramText.split(',').map((param: string) => {
+        const [name, value] = param.split('=').map(p => p.trim());
+        return { name, value: value.replace(/"/g, '') };
+      });
+    }
+    
+    return [];
+  };
+
+  // Current scenario we're viewing
+  const currentScenario = scenariosByMethod[selectedMethod]?.[0];
+
+  // Function to format Karate step
+  const formatKarateStep = (text: string, indent: number = 0) => {
+    const padding = ' '.repeat(indent);
+    return (
+      <div className="font-mono text-sm text-gray-800">
+        {padding}<span className="text-gray-500">*</span> {text}
+      </div>
+    );
+  };
+
+  return (
+    <div className="h-[550px] bg-white">
+      {/* Container with sidebar + content */}
+      <div className="flex h-full">
+        {/* Left sidebar with HTTP methods */}
+        <div className="w-[300px] border-r bg-gray-50 overflow-y-auto">
+          {/* Feature title */}
+          <div className="p-3 font-medium text-gray-700 border-b">
+            {feature.name}
+          </div>
+          
+          {/* List of scenarios by HTTP method */}
+          {Object.entries(scenariosByMethod).map(([method, scenarios]) => (
+            <div key={method}>
+              {(scenarios as any[]).map((scenario: any, idx: number) => (
+                <div 
+                  key={`${method}-${idx}`}
+                  className={`p-3 border-b hover:bg-gray-100 cursor-pointer ${selectedMethod === method ? 'bg-gray-200' : ''}`}
+                  onClick={() => setSelectedMethod(method)}
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge className={`font-mono text-xs px-2 ${methodColors[method]}`}>
+                      {method.toUpperCase()}
+                    </Badge>
+                    <div className="font-medium truncate">{scenario.name}</div>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1 ml-12 truncate">
+                    {getPathForCurrentScenario()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        
+        {/* Main content area - Karate Script */}
+        <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+          {currentScenario ? (
+            <div className="bg-white border rounded-md p-4 shadow-sm">
+              {/* Feature and Scenario Headers */}
+              <div className="mb-4">
+                <div className="text-purple-600 font-mono font-semibold mb-1">Feature: {feature.name}</div>
+                <div className="text-purple-600 font-mono font-semibold">Scenario: {currentScenario.name}</div>
+              </div>
+              
+              {/* Background Setup */}
+              <div className="pb-3 mb-4 border-b">
+                {formatKarateStep("url 'https://api.example.com'")}
+                {formatKarateStep("def authToken = 'dummy-token-for-testing'")}
+                {formatKarateStep("header Authorization = 'Bearer ' + authToken")}
+              </div>
+              
+              {/* Path Parameters */}
+              {extractPathParams(currentScenario).length > 0 && (
+                <div className="mb-4">
+                  {formatKarateStep(`path '${getPathForCurrentScenario()}'`)}
+                  {extractPathParams(currentScenario).map((param: any, idx: number) => (
+                    <div key={`path-${idx}`}>
+                      {formatKarateStep(`def ${param.name} = '${param.value}'`, 2)}
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Query Parameters */}
+              {extractQueryParams(currentScenario).length > 0 && (
+                <div className="mb-4">
+                  {extractQueryParams(currentScenario).map((param: any, idx: number) => (
+                    <div key={`query-${idx}`}>
+                      {formatKarateStep(`param ${param.name} = '${param.value}'`)}
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Request Body */}
+              {extractRequestBody(currentScenario) && (
+                <div className="mb-4">
+                  {formatKarateStep("request")}
+                  <div className="ml-4 mt-1 border-l-2 border-gray-300 pl-3 py-1">
+                    <div className="font-mono text-xs bg-gray-50 p-2 rounded whitespace-pre">
+                      {extractRequestBody(currentScenario)}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Method Call */}
+              <div className="mb-4">
+                {formatKarateStep(`method ${selectedMethod}`)}
+              </div>
+              
+              {/* Response Validation */}
+              <div className="mb-4">
+                {formatKarateStep(`status ${currentScenario.steps.find((step: any) => step.text.includes('status should be'))?.text.match(/should be (\d+)/)?.[1] || '200'}`)}
+                
+                {currentScenario.steps.some((step: any) => 
+                  step.text.includes('response should') && !step.text.includes('status should')
+                ) && (
+                  <>
+                    {formatKarateStep("match response ==", 0)}
+                    <div className="ml-4 mt-1 border-l-2 border-gray-300 pl-3 py-1">
+                      <div className="font-mono text-xs bg-gray-50 p-2 rounded whitespace-pre">
+                        {displayFormat === 'yaml' ? (
+                          jsonToYaml(JSON.stringify({
+                            result: "success",
+                            status: "created", 
+                            data: { id: 123, name: "Example" }
+                          }))
+                        ) : (
+                          JSON.stringify({
+                            result: "success",
+                            status: "created", 
+                            data: { id: 123, name: "Example" }
+                          }, null, 2)
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           ) : (
             <div className="p-8 text-center text-gray-500">
               No scenarios available for this feature
