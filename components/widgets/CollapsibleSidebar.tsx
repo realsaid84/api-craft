@@ -81,7 +81,6 @@ const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({ children }) => 
       icon: sectionIcons['TEST'],
       items: [
         { name: 'Generate Tests', path: '/pages/test/generate' },
-        { name: 'Execute Tests', path: '/pages/test/execute' },
         { name: 'Explore Tests', path: '/pages/test/explore' }
       ]
     }
