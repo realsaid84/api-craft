@@ -551,8 +551,6 @@ const extractRequestBody = (scenario: any) => {
                         </div>
                         
                         <div className="mb-2 text-gray-700 font-medium">Expected Response:</div>
-
-                          <div className="mb-2 text-gray-700 font-medium">Expected Response:</div>
                             
                           {currentScenario.steps.some((step: any) => 
                             step.text.includes('response should') && !step.text.includes('status should')
