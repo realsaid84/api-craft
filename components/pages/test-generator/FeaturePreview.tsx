@@ -206,6 +206,90 @@ const FeaturePreview: React.FC<FeaturePreviewProps> = ({ features, format }) => 
   );
 };
 
+const extractResponseExample = (scenario: any): any => {
+  try {
+    // First look for steps that have a code block with example response
+    const responseStep = scenario.steps.find((step: any) => 
+      step.text.includes('response body should look like') && step.codeBlock
+    );
+    
+    if (responseStep?.codeBlock) {
+      return JSON.parse(responseStep.codeBlock.content);
+    }
+    
+    // For Karate scenarios, look for commented response examples
+    const karateResponseStep = scenario.steps.find((step: any) => 
+      step.text.includes('# Expected response example:')
+    );
+    
+    if (karateResponseStep) {
+      const jsonMatch = karateResponseStep.text.match(/# Expected response example: (\{.*\})/);
+      if (jsonMatch && jsonMatch[1]) {
+        return JSON.parse(jsonMatch[1]);
+      }
+    }
+    
+    // If no example found, generate a basic one based on assertions
+    const responseAssertions = scenario.steps.filter((step: any) => 
+      step.text.includes('response field') && step.text.includes('should be')
+    );
+    
+    if (responseAssertions.length > 0) {
+      const response: any = {};
+      responseAssertions.forEach((step: any) => {
+        const fieldMatch = step.text.match(/response field "([^"]+)"/);
+        if (fieldMatch && fieldMatch[1]) {
+          const fieldName = fieldMatch[1];
+          const typeMatch = step.text.match(/should be a valid (\w+)/);
+          const type = typeMatch ? typeMatch[1] : 'string';
+          
+          switch (type) {
+            case 'string':
+              response[fieldName] = `Example ${fieldName}`;
+              break;
+            case 'number':
+            case 'integer':
+              response[fieldName] = 123;
+              break;
+            case 'boolean':
+              response[fieldName] = true;
+              break;
+            case 'array':
+              response[fieldName] = [];
+              break;
+            case 'object':
+              response[fieldName] = {};
+              break;
+            default:
+              response[fieldName] = null;
+          }
+        }
+      });
+      
+      if (Object.keys(response).length > 0) {
+        return response;
+      }
+    }
+    
+    // Default response if nothing else works
+    return {
+      status: "success",
+      data: {
+        id: 123,
+        name: "Example Resource",
+        createdAt: "2023-01-01T12:00:00Z"
+      },
+      message: "Operation completed successfully"
+    };
+  } catch (error) {
+    console.error('Error extracting response example:', error);
+    return {
+      status: "success",
+      message: "Example response"
+    };
+  }
+};
+
 // Component to display feature in Postman-like style
 const PostmanStyleView: React.FC<{ 
   feature: any; 
@@ -301,26 +385,22 @@ const PostmanStyleView: React.FC<{
     return [];
   };
 
-  // Extract request body from a scenario
-  const extractRequestBody = (scenario: any) => {
-    const requestBodyStep = scenario.steps.find((step: any) => 
-      step.text.includes('request body')
-    );
-    
-    if (requestBodyStep?.codeBlock) {
-      try {
-        if (displayFormat === 'yaml') {
-          return jsonToYaml(requestBodyStep.codeBlock.content);
-        } else {
-          return JSON.stringify(JSON.parse(requestBodyStep.codeBlock.content), null, 2);
-        }
-      } catch (e) {
-        return requestBodyStep.codeBlock.content;
-      }
+// 2. Update this function for the PostmanStyleView component
+const extractRequestBody = (scenario: any) => {
+  const requestBodyStep = scenario.steps.find((step: any) => 
+    step.text.includes('request body')
+  );
+  
+  if (requestBodyStep?.codeBlock) {
+    try {
+      return requestBodyStep.codeBlock.content;
+    } catch (e) {
+      return requestBodyStep.codeBlock.content;
     }
-    
-    return null;
-  };
+  }
+  
+  return null;
+};
 
   // Current scenario we're viewing
   const currentScenario = scenariosByMethod[selectedMethod]?.[0];
@@ -471,35 +551,27 @@ const PostmanStyleView: React.FC<{
                         </div>
                         
                         <div className="mb-2 text-gray-700 font-medium">Expected Response:</div>
-                        
-                        {currentScenario.steps.some((step: any) => 
-                          step.text.includes('response should') && !step.text.includes('status should')
-                        ) ? (
-                          <div className="ml-4 mt-1 border-l-2 border-teal-400 pl-3 py-1">
-                          <div className="font-mono text-xs bg-gray-50 p-2 rounded whitespace-pre overflow-auto max-h-64 shadow-sm border border-gray-100">
-                            {/* Always render YAML for Karate response */}
-                            {jsonToYaml(JSON.stringify({
-                              result: "success",
-                              status: "created", 
-                              data: { 
-                                id: 123, 
-                                name: "Example",
-                                type: "pet",
-                                attributes: {
-                                  color: "brown",
-                                  age: 2,
-                                  vaccinated: true
-                                },
-                                created_at: "2023-01-01T12:00:00Z"
-                              }
-                            }))}
-                          </div>
-                        </div>
-                        ) : (
-                          <div className="text-gray-500">
-                            No specific response structure defined
-                          </div>
-                        )}
+
+                          <div className="mb-2 text-gray-700 font-medium">Expected Response:</div>
+                            
+                          {currentScenario.steps.some((step: any) => 
+                            step.text.includes('response should') && !step.text.includes('status should')
+                          ) ? (
+                            <div className="ml-4 mt-1 border-l-2 border-teal-400 pl-3 py-1">
+                              <div className="font-mono text-xs bg-gray-50 p-2 rounded whitespace-pre overflow-auto max-h-64 shadow-sm border border-gray-100">
+                                {/* Dynamic response data instead of hardcoded */}
+                                {displayFormat === 'yaml' 
+                                  ? jsonToYaml(JSON.stringify(extractResponseExample(currentScenario)))
+                                  : JSON.stringify(extractResponseExample(currentScenario), null, 2)
+                                }
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-gray-500">
+                              No specific response structure defined
+                            </div>
+                          )}
+                                                  
                       </div>
                     </div>
                   </TabsContent>
@@ -775,25 +847,11 @@ const KarateStyleView: React.FC<{
                   step.text.includes('response should') && !step.text.includes('status should')
                 ) && (
                   <>
-                    {formatKarateStep("match response ==", 0)}
+                   {formatKarateStep("match response ==", 0)}
                     <div className="ml-4 mt-1 border-l-2 border-teal-400 pl-3 py-1">
                       <div className="font-mono text-xs bg-gray-50 p-2 rounded whitespace-pre overflow-auto max-h-64 shadow-sm border border-gray-100">
-                        {/* Always render YAML for Karate response */}
-                        {jsonToYaml(JSON.stringify({
-                          result: "success",
-                          status: "created", 
-                          data: { 
-                            id: 123, 
-                            name: "Example",
-                            type: "pet",
-                            attributes: {
-                              color: "brown",
-                              age: 2,
-                              vaccinated: true
-                            },
-                            created_at: "2023-01-01T12:00:00Z"
-                          }
-                        }))}
+                        {/* Dynamic response data instead of hardcoded */}
+                        {jsonToYaml(JSON.stringify(extractResponseExample(currentScenario)))}
                       </div>
                     </div>
                   </>

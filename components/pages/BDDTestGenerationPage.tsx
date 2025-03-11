@@ -400,7 +400,7 @@ export default function BDDTestGenerationPage() {
               {validationResult.errors.length > 0 ? (
                 <AlertCircle className="h-4 w-4" />
               ) : (
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <CheckCircle className="h-4 w-4 text-teal-600" />
               )}
               <AlertDescription>
                 {validationResult.errors.length > 0 

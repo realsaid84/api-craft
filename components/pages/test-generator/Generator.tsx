@@ -39,6 +39,7 @@ interface ParameterObject {
 }
 
 interface SchemaObject {
+  title?: string;
   type?: string;
   format?: string;
   properties?: Record<string, SchemaObject>;
@@ -115,6 +116,199 @@ interface GenerationSettings {
   includeValidation: boolean;
   targetEnvironment: string;
 }
+
+  /**
+   * Resolves a JSON reference to its actual object
+   * @param {string} ref - The JSON reference string
+   * @param {OpenAPISpec} spec - The OpenAPI specification
+   * @returns {any} - The resolved object
+   */
+    const resolveReference = (ref: string, spec: OpenAPISpec): any => {
+      if (!ref.startsWith('#/')) {
+        // External references not supported in this simplified implementation
+        return { type: 'object' };
+      }
+      
+      const parts = ref.substring(2).split('/');
+      let current: any = spec;
+      
+      for (const part of parts) {
+        if (!current[part]) {
+          throw new Error(`Invalid reference: ${ref}, part ${part} not found`);
+        }
+        current = current[part];
+      }
+      
+      return current;
+      };
+
+/**
+ * Generates an example response object based on the schema
+ * @param {SchemaObject} schema - The response schema
+ * @param {OpenAPISpec} spec - The complete OpenAPI spec
+ * @returns {any} - An example response object
+ */
+const generateExampleResponseFromSchema = (schema: SchemaObject, spec: OpenAPISpec): any => {
+  // Resolve reference if needed
+  if (schema.$ref) {
+    schema = resolveReference(schema.$ref, spec);
+  }
+  
+  // Use example if available
+  if (schema.example) {
+    return schema.example;
+  }
+  
+  // Use examples if available
+  if (schema.examples && schema.examples.length > 0) {
+    return schema.examples[0];
+  }
+
+  const type = schema.type || 'object';
+  
+  switch (type) {
+    case 'object': {
+      const result: Record<string, any> = {};
+      
+      // Add standard response envelope for API responses
+      if (!schema.properties) {
+        return {
+          status: "success",
+          data: {},
+          message: "Operation completed successfully"
+        };
+      }
+      
+      // Process properties
+      for (const [propName, propSchema] of Object.entries(schema.properties)) {
+        result[propName] = generateExampleResponseFromSchema(propSchema, spec);
+      }
+      
+      return result;
+    }
+    case 'array': {
+      if (schema.items) {
+        const exampleItem = generateExampleResponseFromSchema(schema.items, spec);
+        // Return 2 items for better visualization
+        return [exampleItem, {...exampleItem, id: typeof exampleItem.id === 'number' ? exampleItem.id + 1 : 'item-2'}];
+      }
+      return [];
+    }
+    case 'string': {
+      if (schema.enum && schema.enum.length > 0) {
+        return schema.enum[0];
+      }
+      
+      const format = schema.format;
+      if (format === 'date') return '2023-01-01';
+      if (format === 'date-time') return '2023-01-01T12:00:00Z';
+      if (format === 'email') return 'user@example.com';
+      if (format === 'uuid') return '12345678-1234-1234-1234-123456789012';
+      if (format === 'uri') return 'https://example.com';
+      
+      // Generate meaningful examples based on property name
+      const propName = schema.title?.toLowerCase() || '';
+      if (propName.includes('name') || propName.includes('title')) return 'Example Name';
+      if (propName.includes('description')) return 'This is an example description';
+      if (propName.includes('status')) return 'completed';
+      if (propName.includes('message')) return 'Operation completed successfully';
+      if (propName.includes('error')) return 'An error occurred';
+      
+      return 'example-string';
+    }
+    case 'number':
+    case 'integer': {
+      // Generate meaningful examples based on property name
+      const propName = schema.title?.toLowerCase() || '';
+      if (propName.includes('id')) return 123;
+      if (propName.includes('age')) return 25;
+      if (propName.includes('count')) return 42;
+      if (propName.includes('price') || propName.includes('amount')) return 99.99;
+      
+      return propName.includes('price') ? 99.99 : 42; 
+    }
+    case 'boolean':
+      return true;
+    default:
+      return null;
+  }
+};
+
+// Update this function to include example response data
+const addAssertionsForResponse = (steps: Step[], schema: SchemaObject, spec: OpenAPISpec): void => {
+  // Resolve reference if needed
+  if (schema.$ref) {
+    schema = resolveReference(schema.$ref, spec);
+  }
+  
+  // Generate example response
+  const exampleResponse = generateExampleResponseFromSchema(schema, spec);
+  
+  // Add the example response as a step with codeblock
+  steps.push({
+    type: 'And',
+    text: 'the response body should look like:',
+    codeBlock: {
+      language: 'json',
+      content: JSON.stringify(exampleResponse, null, 2)
+    }
+  });
+  
+  // Rest of the existing function...
+  
+  // If schema is an array, add assertions for array response
+  if (schema.type === 'array') {
+    steps.push({
+      type: 'And',
+      text: 'the response should be a valid array'
+    });
+    
+    // If we have item schema, add example assertion
+    if (schema.items) {
+      // Only add this for medium or comprehensive test depth
+      steps.push({
+        type: 'And',
+        text: 'each array item should match the expected structure'
+      });
+    }
+    
+    return;
+  }
+  
+  // Object assertions
+  if (schema.type === 'object' || schema.properties) {
+    steps.push({
+      type: 'And',
+      text: 'the response should be a valid JSON object'
+    });
+    
+    // Add assertions for required properties
+    if (schema.required && schema.required.length > 0) {
+      const requiredFields = schema.required.slice(0, 3).join(', '); // Limit to 3 for brevity
+      
+      steps.push({
+        type: 'And',
+        text: `the response should contain required fields: ${requiredFields}${schema.required.length > 3 ? ', ...' : ''}`
+      });
+    }
+    
+    // Add assertions for important properties
+    if (schema.properties) {
+      // Get a small sample of properties (up to 3) for assertions
+      const propertyNames = Object.keys(schema.properties).slice(0, 3);
+      
+      propertyNames.forEach(propName => {
+        const propSchema = schema.properties?.[propName];
+        steps.push({
+          type: 'And',
+          text: `the response field "${propName}" should be a valid ${propSchema?.type || 'value'}`
+        });
+      });
+    }
+  }
+};
+
+
 
 /**
  * Generates BDD feature files from an OpenAPI specification
@@ -417,6 +611,8 @@ export const generateBddFeatures = async (spec: OpenAPISpec, settings: Generatio
     
     return null;
   };
+
+
   
   /**
    * Generates Karate scenarios for an API operation
@@ -547,6 +743,9 @@ export const generateBddFeatures = async (spec: OpenAPISpec, settings: Generatio
     return scenarios;
   };
   
+
+    
+      
   /**
    * Adds Karate-style assertions for a response based on its schema
    * @param {Step[]} steps - The array of steps to add assertions to
@@ -1019,31 +1218,7 @@ export const generateBddFeatures = async (spec: OpenAPISpec, settings: Generatio
     });
   };
   
-  /**
-   * Resolves a JSON reference to its actual object
-   * @param {string} ref - The JSON reference string
-   * @param {OpenAPISpec} spec - The OpenAPI specification
-   * @returns {any} - The resolved object
-   */
-  const resolveReference = (ref: string, spec: OpenAPISpec): any => {
-    if (!ref.startsWith('#/')) {
-      // External references not supported in this simplified implementation
-      return { type: 'object' };
-    }
-    
-    const parts = ref.substring(2).split('/');
-    let current: any = spec;
-    
-    for (const part of parts) {
-      if (!current[part]) {
-        throw new Error(`Invalid reference: ${ref}, part ${part} not found`);
-      }
-      current = current[part];
-    }
-    
-    return current;
-  };
-  
+
   /**
    * Generates an example value for a parameter based on its type and format
    * @param {ParameterObject} param - The parameter object
@@ -1214,69 +1389,7 @@ export const generateBddFeatures = async (spec: OpenAPISpec, settings: Generatio
     };
   };
   
-  /**
-   * Adds assertions for a response based on its schema
-   * @param {Step[]} steps - The array of steps to add assertions to
-   * @param {SchemaObject} schema - The response schema
-   * @param {OpenAPISpec} spec - The complete OpenAPI spec
-   */
-  const addAssertionsForResponse = (steps: Step[], schema: SchemaObject, spec: OpenAPISpec): void => {
-    // Resolve reference if needed
-    if (schema.$ref) {
-      schema = resolveReference(schema.$ref, spec);
-    }
-    
-    // If schema is an array, add assertions for array response
-    if (schema.type === 'array') {
-      steps.push({
-        type: 'And',
-        text: 'the response should be a valid array'
-      });
-      
-      // If we have item schema, add example assertion
-      if (schema.items) {
-        // Only add this for medium or comprehensive test depth
-        steps.push({
-          type: 'And',
-          text: 'each array item should match the expected structure'
-        });
-      }
-      
-      return;
-    }
-    
-    // Object assertions
-    if (schema.type === 'object' || schema.properties) {
-      steps.push({
-        type: 'And',
-        text: 'the response should be a valid JSON object'
-      });
-      
-      // Add assertions for required properties
-      if (schema.required && schema.required.length > 0) {
-        const requiredFields = schema.required.slice(0, 3).join(', '); // Limit to 3 for brevity
-        
-        steps.push({
-          type: 'And',
-          text: `the response should contain required fields: ${requiredFields}${schema.required.length > 3 ? ', ...' : ''}`
-        });
-      }
-      
-      // Add assertions for important properties
-      if (schema.properties) {
-        // Get a small sample of properties (up to 3) for assertions
-        const propertyNames = Object.keys(schema.properties).slice(0, 3);
-        
-        propertyNames.forEach(propName => {
-          const propSchema = schema.properties?.[propName];
-          steps.push({
-            type: 'And',
-            text: `the response field "${propName}" should be a valid ${propSchema?.type || 'value'}`
-          });
-        });
-      }
-    }
-  };
+
   
   /**
    * Adds validation error scenarios for required fields
