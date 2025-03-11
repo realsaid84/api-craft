@@ -20,6 +20,7 @@ const FeaturePreview: React.FC<FeaturePreviewProps> = ({ features, format }) => 
   const [copied, setCopied] = useState<boolean>(false);
   const [displayFormat, setDisplayFormat] = useState<'json' | 'yaml'>('yaml');
   const [viewMode, setViewMode] = useState<'client' | 'karate' | 'code'>('client');
+  const [isValidSpec, setIsValidSpec] = useState<boolean>(true); // Assuming spec is valid by default
 
   // Get the selected feature object
   const getSelectedFeature = () => {
@@ -79,8 +80,14 @@ const FeaturePreview: React.FC<FeaturePreviewProps> = ({ features, format }) => 
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div className="w-64">
+          <div className="flex items-center gap-2 mb-2">
+            <div className={`w-2 h-2 rounded-full ${isValidSpec ? 'bg-teal-500 animate-pulse shadow-md shadow-teal-200' : 'bg-gray-300'}`}></div>
+            <span className={`text-sm ${isValidSpec ? 'text-teal-600 font-medium' : 'text-teal-500'}`}>
+              {isValidSpec ? 'Valid OpenAPI Spec' : 'Spec Validation Pending'}
+            </span>
+          </div>
           <Select value={selectedFeature} onValueChange={setSelectedFeature}>
-            <SelectTrigger>
+            <SelectTrigger className={isValidSpec ? 'border-teal-200 ring-1 ring-teal-100' : ''}>
               <SelectValue placeholder="Select a feature" />
             </SelectTrigger>
             <SelectContent>
@@ -468,22 +475,26 @@ const PostmanStyleView: React.FC<{
                         {currentScenario.steps.some((step: any) => 
                           step.text.includes('response should') && !step.text.includes('status should')
                         ) ? (
-                          <div className="border rounded-md bg-gray-50 p-4 font-mono text-sm">
-                            {/* Simplified for illustration; more complex logic would be needed for real response structure */}
-                            {displayFormat === 'yaml' ? (
-                              jsonToYaml(JSON.stringify({
-                                result: "success",
-                                status: "created", 
-                                data: { id: 123, name: "Example" }
-                              }))
-                            ) : (
-                              JSON.stringify({
-                                result: "success",
-                                status: "created", 
-                                data: { id: 123, name: "Example" }
-                              }, null, 2)
-                            )}
+                          <div className="ml-4 mt-1 border-l-2 border-teal-400 pl-3 py-1">
+                          <div className="font-mono text-xs bg-gray-50 p-2 rounded whitespace-pre overflow-auto max-h-64 shadow-sm border border-gray-100">
+                            {/* Always render YAML for Karate response */}
+                            {jsonToYaml(JSON.stringify({
+                              result: "success",
+                              status: "created", 
+                              data: { 
+                                id: 123, 
+                                name: "Example",
+                                type: "pet",
+                                attributes: {
+                                  color: "brown",
+                                  age: 2,
+                                  vaccinated: true
+                                },
+                                created_at: "2023-01-01T12:00:00Z"
+                              }
+                            }))}
                           </div>
+                        </div>
                         ) : (
                           <div className="text-gray-500">
                             No specific response structure defined
@@ -667,16 +678,27 @@ const KarateStyleView: React.FC<{
           {currentScenario ? (
             <div className="bg-white border rounded-md p-4 shadow-sm">
               {/* Feature and Scenario Headers */}
-              <div className="mb-4">
-                <div className="text-purple-600 font-mono font-semibold mb-1">Feature: {feature.name}</div>
-                <div className="text-purple-600 font-mono font-semibold">Scenario: {currentScenario.name}</div>
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="bg-gradient-to-r from-teal-500 to-teal-600 px-3 py-1 rounded-md text-white font-semibold text-sm shadow-sm">Feature</div>
+                  <div className="font-mono font-semibold text-gray-700">{feature.name}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-3 py-1 rounded-md text-white font-semibold text-sm shadow-sm">Scenario</div>
+                  <div className="font-mono font-semibold text-gray-700">{currentScenario.name}</div>
+                </div>
               </div>
               
               {/* Background Setup */}
-              <div className="pb-3 mb-4 border-b">
-                {formatKarateStep("url 'https://api.example.com'")}
-                {formatKarateStep("def authToken = 'dummy-token-for-testing'")}
-                {formatKarateStep("header Authorization = 'Bearer ' + authToken")}
+              <div className="pb-3 mb-6 border-b border-gray-200">
+                <div className="flex items-center mb-2">
+                  <div className="bg-gradient-to-r from-blue-400 to-blue-500 px-3 py-1 rounded-md text-white font-semibold text-xs shadow-sm">Setup</div>
+                </div>
+                <div className="bg-blue-50 rounded-md p-3 border border-blue-100">
+                  {formatKarateStep("url 'https://api.example.com'")}
+                  {formatKarateStep("def authToken = 'dummy-token-for-testing'")}
+                  {formatKarateStep("header Authorization = 'Bearer ' + authToken")}
+                </div>
               </div>
               
               {/* Path Parameters */}
@@ -704,11 +726,25 @@ const KarateStyleView: React.FC<{
               
               {/* Request Body */}
               {extractRequestBody(currentScenario) && (
-                <div className="mb-4">
-                  {formatKarateStep("request")}
-                  <div className="ml-4 mt-1 border-l-2 border-gray-300 pl-3 py-1">
-                    <div className="font-mono text-xs bg-gray-50 p-2 rounded whitespace-pre">
-                      {extractRequestBody(currentScenario)}
+                <div className="mb-6">
+                  <div className="flex items-center mb-2">
+                    <div className="bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-1 rounded-md text-white font-semibold text-xs shadow-sm mr-2">Request</div>
+                    {formatKarateStep("request")}
+                  </div>
+                  <div className="ml-4 mt-1 border-l-2 border-amber-400 pl-3 py-1">
+                    <div className="font-mono text-xs bg-gray-50 p-3 rounded whitespace-pre overflow-auto max-h-48 shadow-sm border border-gray-100">
+                      <SyntaxHighlighter
+                        language={displayFormat === 'yaml' ? 'yaml' : 'json'}
+                        style={xonokai}
+                        customStyle={{
+                          background: 'transparent',
+                          margin: 0,
+                          padding: 0,
+                          fontSize: '0.75rem'
+                        }}
+                      >
+                        {extractRequestBody(currentScenario) || ''}
+                      </SyntaxHighlighter>
                     </div>
                   </div>
                 </div>
@@ -716,7 +752,19 @@ const KarateStyleView: React.FC<{
               
               {/* Method Call */}
               <div className="mb-4">
-                {formatKarateStep(`method ${selectedMethod}`)}
+                <div className="flex items-center">
+                  <div className={`font-mono text-sm ${
+                    selectedMethod === 'get' ? 'bg-blue-500' :
+                    selectedMethod === 'post' ? 'bg-orange-500' :
+                    selectedMethod === 'put' ? 'bg-green-600' :
+                    selectedMethod === 'delete' ? 'bg-red-500' :
+                    selectedMethod === 'patch' ? 'bg-purple-500' :
+                    'bg-gray-500'
+                  } text-white px-3 py-1 rounded-md shadow-sm font-semibold mr-3`}>
+                    {selectedMethod.toUpperCase()}
+                  </div>
+                  {formatKarateStep(`method ${selectedMethod}`)}
+                </div>
               </div>
               
               {/* Response Validation */}
@@ -728,21 +776,24 @@ const KarateStyleView: React.FC<{
                 ) && (
                   <>
                     {formatKarateStep("match response ==", 0)}
-                    <div className="ml-4 mt-1 border-l-2 border-gray-300 pl-3 py-1">
-                      <div className="font-mono text-xs bg-gray-50 p-2 rounded whitespace-pre">
-                        {displayFormat === 'yaml' ? (
-                          jsonToYaml(JSON.stringify({
-                            result: "success",
-                            status: "created", 
-                            data: { id: 123, name: "Example" }
-                          }))
-                        ) : (
-                          JSON.stringify({
-                            result: "success",
-                            status: "created", 
-                            data: { id: 123, name: "Example" }
-                          }, null, 2)
-                        )}
+                    <div className="ml-4 mt-1 border-l-2 border-teal-400 pl-3 py-1">
+                      <div className="font-mono text-xs bg-gray-50 p-2 rounded whitespace-pre overflow-auto max-h-64 shadow-sm border border-gray-100">
+                        {/* Always render YAML for Karate response */}
+                        {jsonToYaml(JSON.stringify({
+                          result: "success",
+                          status: "created", 
+                          data: { 
+                            id: 123, 
+                            name: "Example",
+                            type: "pet",
+                            attributes: {
+                              color: "brown",
+                              age: 2,
+                              vaccinated: true
+                            },
+                            created_at: "2023-01-01T12:00:00Z"
+                          }
+                        }))}
                       </div>
                     </div>
                   </>
