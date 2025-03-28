@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Eye, Settings, ShieldCheck, Code, Activity, Heart, FileSearch, BookOpen } from 'lucide-react';
+import { Code, FileSearch, BookOpen } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { Button } from '@/components/ui/button';
 

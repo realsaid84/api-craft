@@ -97,10 +97,10 @@ const Task = ({ children }: BlockProps) => (
 
 export  const OpenAPIWorkshop = () => {
   return (
-    <div className="max-w-5xl mx-auto p-8 bg-white">
+    <div className="flex-1 overflow-auto p-2 md:p-8 lg:p-10">
       <div className="mb-12">
         <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-4xl font-bold mb-4">OpenAPI 3.0 Workshop</h1>
+        <h1 className="text-4xl font-bold mb-4  text-teal-600">OpenAPI 3.0 Workshop</h1>
           <Link href="../learn/openapi-cheatsheet" className="no-underline">
             <Button className="flex items-center gap-2">
               <BookOpen className="w-5 h-5" />
