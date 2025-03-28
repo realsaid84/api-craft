@@ -1,4 +1,4 @@
-# API Spike Docs Development Guide
+# Data API Accelerator Studio Development Guide
 
 ## Commands
 - Build: `npm run build`
