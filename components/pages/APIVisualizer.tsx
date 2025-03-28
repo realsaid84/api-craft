@@ -24,7 +24,7 @@ import {
 import * as yaml from 'js-yaml';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { xonokai } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { RedocStandalone } from 'redoc';
+import { ApiReferenceReact } from '@scalar/api-reference-react';
 import { useRouter } from 'next/navigation';
 
 interface APIVisualizerProps {
@@ -192,17 +192,16 @@ export const APIVisualizer: React.FC<APIVisualizerProps> = ({
       });
   };
 
-// Handle Quality Metrics button click
-const handleQualityMetricsClick = () => {
-  try {
-    console.log('Stored API spec for quality analysis in session storage');
-    // Navigate to the quality page without the large query parameter
-    router.push(`/pages/observe/api-quality?schemaUrl=${schemaUrl}`);
-  } catch (error) {
-    console.error('Error fushing API spec url:', error);
-  }
-};
-
+  // Handle Quality Metrics button click
+  const handleQualityMetricsClick = () => {
+    try {
+      console.log('Stored API spec for quality analysis in session storage');
+      // Navigate to the quality page without the large query parameter
+      router.push(`/pages/observe/api-quality?schemaUrl=${schemaUrl}`);
+    } catch (error) {
+      console.error('Error fushing API spec url:', error);
+    }
+  };
 
   // Get the title from props or the parsed spec
   const displayTitle = modelName || parsedSpec?.info?.title || title;
@@ -252,7 +251,7 @@ const handleQualityMetricsClick = () => {
 
   return (
     <div className="flex-1 overflow-auto p-2 md:p-8 lg:p-10">
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full mx-auto">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
             <Button 
@@ -271,7 +270,7 @@ const handleQualityMetricsClick = () => {
               variant="ghost" 
               size="sm" 
               className="flex items-center gap-1"
-              onClick={() => router.push('/learn/openapi-cheatsheet')}
+              onClick={() => router.push('/pages/learn/openapi-cheatsheet')}
             >
               <BookOpen className="h-4 w-4" />
               <span>OpenAPI Cheatsheet</span>
@@ -379,21 +378,22 @@ const handleQualityMetricsClick = () => {
         )}
 
         {activeView === 'visual' ? (
-          <div className="mb-8 flex items-center justify-between">
-              {parsedSpec && (
-                <div className="h-[1000vh] border rounded overflow-hidden">
-                  <RedocStandalone 
-                    spec={parsedSpec}
-                    options={{
-                      nativeScrollbars: true,
-                      hideDownloadButton: true,
-                      theme: { colors: { primary: { main: '#0f766e' } } } // Match teal color
-                    }}
-                  />
-                </div>
-              )}
-           </div>
-        ): (
+          <div className="w-full">
+            {parsedSpec && (
+              <div className="w-full max-h-[80vh] overflow-y-auto rounded border p-4">
+                <ApiReferenceReact
+                  configuration={{
+                    content: parsedSpec,
+                    hideDarkModeToggle: false,
+                    title: displayTitle,
+                    layout: "modern",
+                    forceDarkModeState: 'light',
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        ) : (
           <Card>
             <CardContent className="pt-6"> 
               <div className="w-full h-[70vh] font-mono text-sm border rounded focus-within:ring-2 focus-within:ring-teal-500 overflow-hidden relative">
@@ -430,7 +430,7 @@ const handleQualityMetricsClick = () => {
               </div>
             </CardContent>
           </Card>
-        ) }
+        )}
       </div>
     </div>
   );

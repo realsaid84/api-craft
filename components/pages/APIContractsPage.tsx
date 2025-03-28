@@ -81,7 +81,7 @@ const APIModelCard = ({ model, onClick, router }: { model: APIContractModel; onC
             <div className="flex justify-between items-center text-sm text-muted-foreground">
               <span>Updated {model.lastModified}</span>
               <span>{model.owner}</span>
-            <Button  size="sm" className="flex items-center gap-1" 
+            <Button  size="sm" className="px-4 py-2 bg-gray-100 text-teal-600 rounded-md flex items-center gap-2 hover:bg-primary/40 transition-colors cursor-pointer" 
                 variant="outline" asChild 
                 onClick={() => handleModelClick(model, router)}>
              <span>More →</span>
