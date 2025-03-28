@@ -24,7 +24,7 @@ import {
 import * as yaml from 'js-yaml';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { xonokai } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { ApiReference } from '@scalar/nextjs-api-reference';
+import { ApiReferenceReact } from '@scalar/api-reference-react';
 import { useRouter } from 'next/navigation';
 
 interface APIVisualizerProps {
@@ -380,30 +380,14 @@ export const APIVisualizer: React.FC<APIVisualizerProps> = ({
         {activeView === 'visual' ? (
           <div className="w-full">
             {parsedSpec && (
-              <div className="w-full h-[calc(100vh-200px)] border rounded overflow-hidden">
-                <ApiReference
-                  spec={parsedSpec}
+              <div className="w-full max-h-[80vh] overflow-y-auto rounded border p-4">
+                <ApiReferenceReact
                   configuration={{
-                    theme: {
-                      colors: {
-                        primary: {
-                          50: '#f0fdfa',
-                          100: '#ccfbf1',
-                          200: '#99f6e4',
-                          300: '#5eead4',
-                          400: '#2dd4bf',
-                          500: '#14b8a6',
-                          600: '#0f766e',
-                          700: '#115e59',
-                          800: '#134e4a',
-                          900: '#022c22',
-                          950: '#011a13',
-                        }
-                      }
-                    },
-                    isEditable: false,
-                    expandSidebar: true,
-                    layout: "modern"
+                    content: parsedSpec,
+                    hideDarkModeToggle: false,
+                    title: displayTitle,
+                    layout: "modern",
+                    forceDarkModeState: 'light',
                   }}
                 />
               </div>
